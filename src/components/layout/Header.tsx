@@ -279,6 +279,18 @@ export const Header: React.FC = () => {
           )}
         </div>
 
+        {/* External Authority & Partner Portal Link */}
+        <a
+          href={process.env.NEXT_PUBLIC_EXTERNAL_PORTAL_URL || 'http://localhost:3001'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded bg-[#1d4ed8]/20 border border-[#38bdf8]/60 text-[#38bdf8] hover:bg-[#1d4ed8]/30 hover:border-[#38bdf8] text-xs font-bold transition-all shadow-[0_0_10px_rgba(56,189,248,0.2)] font-mono"
+          title="Open ECO-SMART Authority & Partner Portal"
+        >
+          <span className="text-sm">🏛️</span>
+          <span>EXTERNAL PORTAL</span>
+        </a>
+
         {/* Authentication Button */}
         {isAuthenticated ? (
           <button
