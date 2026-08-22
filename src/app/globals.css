@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@layer base {
+  :root {
+    --bg-dark: #07080E;
+    --card-dark: #0D0F17;
+    --card-border: #1D2133;
+    --squid-pink: #FF007A;
+    --squid-pink-glow: rgba(255, 0, 122, 0.35);
+    --squid-teal: #03E5B7;
+    --squid-teal-glow: rgba(3, 229, 183, 0.35);
+    --cyber-green: #00FF66;
+    --gold-rank: #FFC700;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-mono, .font-hud, .font-orbitron {
+    font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  }
+}
+
+/* Squid Game Signature Theme & Glitch HUD Utilities */
+.bg-squid-dark {
+  background-color: #07080E;
+}
+
+.bg-squid-card {
+  background-color: #0D0F17;
+  border: 1px solid #1D2133;
+}
+
+.text-squid-pink {
+  color: #FF007A;
+}
+
+.text-squid-teal {
+  color: #03E5B7;
+}
+
+.text-squid-gold {
+  color: #FFC700;
+}
+
+.border-squid-pink {
+  border-color: #FF007A;
+}
+
+.border-squid-teal {
+  border-color: #03E5B7;
+}
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 122, 0.4);
+}
+
+.glow-teal {
+  box-shadow: 0 0 20px rgba(3, 229, 183, 0.4);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 199, 0, 0.4);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+}
+
+/* Squid Game Grid Background */
+.squid-grid-bg {
+  background-color: #07080E;
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(255, 0, 122, 0.08) 0%, transparent 60%),
+    linear-gradient(rgba(255, 0, 122, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(3, 229, 183, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+}
+
+/* Custom Tactical Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #07080E;
+}
+::-webkit-scrollbar-thumb {
+  background: #FF007A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #03E5B7;
+}
