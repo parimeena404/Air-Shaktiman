@@ -245,7 +245,7 @@ export const Sidebar: React.FC = () => {
           <h1 className="font-black text-xl text-white tracking-wider flex items-center gap-2">
             <span className="text-[#FF007A] text-lg font-bold">◯ △ □</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF007A] via-[#FFC700] to-[#03E5B7]">
-              ECOVERSE
+              CITY GUARDIAN
             </span>
           </h1>
           <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] font-bold">

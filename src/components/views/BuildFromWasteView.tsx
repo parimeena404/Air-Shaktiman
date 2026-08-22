@@ -13,13 +13,13 @@ export const BuildFromWasteView: React.FC = () => {
   return (
     <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-300">
       {/* Title */}
-      <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A855F7]/15 border border-[#A855F7]/40 text-[#A855F7] text-xs font-mono font-bold mb-2">
+      <div className="bg-[#0D0F17] border-2 border-[#FF007A] rounded-xl p-6 space-y-2 shadow-2xl glow-pink">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] text-xs font-mono font-black">
           <Hammer className="w-3.5 h-3.5" />
-          <span>AI CRAFTING WORKBENCH</span>
+          <span>AI CRAFTING WORKBENCH // SQUID ARENA</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-white">What Can I Do With My Waste?</h1>
-        <p className="text-xs text-slate-400">
+        <h1 className="text-3xl font-black text-white tracking-wide font-mono">What Can I Do With My Waste?</h1>
+        <p className="text-xs text-slate-300 font-mono font-bold">
           Upload any waste photo or select waste categories to generate 4 AI recovery pathways (Recycle, Sell, Reuse, or Build).
         </p>
       </div>

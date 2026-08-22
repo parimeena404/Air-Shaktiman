@@ -27,7 +27,7 @@ export const UserManagementView: React.FC = () => {
         </div>
         <h1 className="text-2xl font-extrabold text-white">Community & User Management</h1>
         <p className="text-xs text-slate-400">
-          Inspect, manage, & verify registered citizens, students, businesses, & NGOs across EcoVerse.
+          Inspect, manage, & verify registered citizens, students, businesses, & NGOs across City Guardian.
         </p>
       </div>
 

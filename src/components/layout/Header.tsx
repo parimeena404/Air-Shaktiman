@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
   const getPageTitle = (tab: MainTab): string => {
     switch (tab) {
       case 'overview':
-        return 'ECOVERSE ARENA';
+        return 'CITY GUARDIAN ARENA';
       case 'report-waste':
         return 'WASTE DISPOSAL // PROTOCOL';
       case 'contributions':
@@ -116,7 +116,7 @@ export const Header: React.FC = () => {
       case 'csr-reports':
         return 'CSR IMPACT AUDIT REPORTS';
       default:
-        return 'ECOVERSE ARENA';
+        return 'CITY GUARDIAN ARENA';
     }
   };
 

@@ -15,7 +15,7 @@ export const AdminOverviewView: React.FC = () => {
           <Shield className="w-3.5 h-3.5" />
           <span>ENTERPRISE OPERATIONS CONTROL</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-white">EcoVerse Operations Dashboard</h1>
+        <h1 className="text-2xl font-extrabold text-white">City Guardian Operations Dashboard</h1>
         <p className="text-xs text-slate-400">
           Monitor sustainability activity across the campus, business partners, & municipal community.
         </p>

@@ -179,7 +179,7 @@ export const RedeemRewardsView: React.FC = () => {
 
             {/* DUMMY VOUCHER CARD */}
             <div className="p-6 rounded-2xl bg-gradient-to-b from-[#140A18] to-[#07080E] border border-dashed border-[#03E5B7] space-y-3 font-mono">
-              <div className="text-[10px] text-slate-500 tracking-widest">ECOVERSE REWARD VOUCHER</div>
+              <div className="text-[10px] text-slate-500 tracking-widest">CITY GUARDIAN REWARD VOUCHER</div>
               <div className="text-lg font-extrabold text-[#03E5B7]">{successVoucher.businessName}</div>
               <div className="text-2xl font-black text-white">{successVoucher.rewardTitle}</div>
               <div className="py-2 px-4 rounded-xl bg-slate-900 border border-slate-700 text-lg font-bold text-[#FFC700] tracking-wider">

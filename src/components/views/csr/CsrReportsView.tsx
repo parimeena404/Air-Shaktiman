@@ -13,7 +13,7 @@ export const CsrReportsView: React.FC = () => {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
-      addToast('📄 Annual CSR Impact Audit Report Generated & Verified by EcoVerse Audit Engine!', 'success');
+      addToast('📄 Annual CSR Impact Audit Report Generated & Verified by City Guardian Audit Engine!', 'success');
     }, 1500);
   };
 
@@ -22,17 +22,17 @@ export const CsrReportsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-mono select-none animate-in fade-in duration-300">
+    <div className="space-y-6 max-w-6xl mx-auto font-mono select-none animate-in fade-in duration-300">
       {/* Header */}
-      <div className="bg-[#09120D] border border-[#00FF66]/40 rounded-lg p-5 space-y-2">
+      <div className="bg-[#0D0F17] border-2 border-[#03E5B7] rounded-xl p-6 space-y-2 shadow-2xl glow-teal">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#00FF66]/20 border border-[#00FF66]/40 text-[#00FF66] text-xs font-bold mb-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#03E5B7]/20 border border-[#03E5B7]/40 text-[#03E5B7] text-xs font-black mb-1">
               <FileText className="w-3.5 h-3.5" />
               <span>OFFICIAL CSR IMPACT AUDIT REPORT ENGINE</span>
             </div>
-            <h1 className="text-2xl font-extrabold text-white tracking-widest">CSR IMPACT REPORTS</h1>
-            <p className="text-xs text-[#527A67]">
+            <h1 className="text-3xl font-black text-white tracking-widest">CSR IMPACT REPORTS</h1>
+            <p className="text-xs text-slate-300 font-bold">
               Generate ISO-compliant environmental compliance reports for corporate CSR filing and board audits.
             </p>
           </div>
@@ -40,7 +40,7 @@ export const CsrReportsView: React.FC = () => {
           <button
             onClick={handleGenerateReport}
             disabled={isGenerating}
-            className="px-5 py-2.5 bg-[#00FF66] text-[#050B08] font-extrabold text-xs rounded hover:bg-[#00FF66]/90 transition-all glow-green flex items-center gap-2"
+            className="px-5 py-3 bg-[#03E5B7] text-[#07080E] font-black text-xs rounded-lg hover:bg-[#03E5B7]/90 transition-all glow-teal flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
             <span>{isGenerating ? 'GENERATING REPORT...' : 'GENERATE NEW REPORT'}</span>
@@ -50,24 +50,24 @@ export const CsrReportsView: React.FC = () => {
 
       {/* Report Preview Document Card */}
       {selectedReport && (
-        <div className="bg-[#09120D] border-2 border-[#00FF66]/60 rounded-lg p-6 md:p-8 space-y-6 shadow-2xl">
-          <div className="flex justify-between items-start border-b border-[#12281D] pb-4">
+        <div className="bg-[#0D0F17] border-2 border-[#FF007A] rounded-xl p-6 md:p-8 space-y-6 shadow-2xl glow-pink">
+          <div className="flex flex-col md:flex-row justify-between items-start border-b border-[#1D2133] pb-4 gap-4">
             <div>
-              <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#00FF66]/20 text-[#00FF66] font-bold">
+              <span className="text-[10px] px-2.5 py-0.5 rounded bg-[#FF007A]/20 text-[#FF007A] font-black border border-[#FF007A]/40">
                 VERIFIED CSR COMPLIANCE AUDIT
               </span>
-              <h2 className="text-xl font-extrabold text-white mt-1">
+              <h2 className="text-xl font-black text-white mt-2">
                 {selectedReport.companyName.toUpperCase()} — ANNUAL CSR AUDIT REPORT
               </h2>
-              <span className="text-xs text-[#527A67]">DATE OF ISSUANCE: {selectedReport.generatedDate}</span>
+              <span className="text-xs text-slate-400 font-bold">DATE OF ISSUANCE: {selectedReport.generatedDate}</span>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleDownload}
-                className="px-4 py-2 bg-[#050B08] border border-[#00FF66] text-[#00FF66] text-xs font-bold rounded hover:bg-[#00FF66]/20 transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-[#07080E] border border-[#03E5B7] text-[#03E5B7] text-xs font-black rounded-lg hover:bg-[#03E5B7]/20 transition-all flex items-center gap-1.5 glow-teal"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
                 <span>DOWNLOAD PDF</span>
               </button>
             </div>
@@ -75,35 +75,35 @@ export const CsrReportsView: React.FC = () => {
 
           {/* Audit Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3.5 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-              <span className="text-[9px] text-[#527A67]">CSR INVESTMENT</span>
-              <div className="font-bold text-[#F5C518] text-sm">₹{selectedReport.investmentInr.toLocaleString()}</div>
+            <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+              <span className="text-[9px] text-slate-400 font-bold">CSR INVESTMENT</span>
+              <div className="font-black text-[#FFC700] text-base">₹{selectedReport.investmentInr.toLocaleString()}</div>
             </div>
-            <div className="p-3.5 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-              <span className="text-[9px] text-[#527A67]">WASTE RECOVERED</span>
-              <div className="font-bold text-[#00FF66] text-sm">{selectedReport.wasteRecoveredKg.toLocaleString()} KG</div>
+            <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+              <span className="text-[9px] text-slate-400 font-bold">WASTE RECOVERED</span>
+              <div className="font-black text-[#03E5B7] text-base">{selectedReport.wasteRecoveredKg.toLocaleString()} KG</div>
             </div>
-            <div className="p-3.5 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-              <span className="text-[9px] text-[#527A67]">PLAYER DEPLOYMENTS</span>
-              <div className="font-bold text-white text-sm">{selectedReport.participantsCount.toLocaleString()}</div>
+            <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+              <span className="text-[9px] text-slate-400 font-bold">PLAYER DEPLOYMENTS</span>
+              <div className="font-black text-white text-base">{selectedReport.participantsCount.toLocaleString()}</div>
             </div>
-            <div className="p-3.5 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-              <span className="text-[9px] text-[#527A67]">CAMPUSES & PARTNERS</span>
-              <div className="font-bold text-white text-sm">{selectedReport.campusesCount} Campuses • {selectedReport.partnersCount} NGOs</div>
+            <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+              <span className="text-[9px] text-slate-400 font-bold">CAMPUSES & PARTNERS</span>
+              <div className="font-black text-white text-base">{selectedReport.campusesCount} Campuses • {selectedReport.partnersCount} NGOs</div>
             </div>
           </div>
 
-          {/* Verification Stamps */}
-          <div className="p-4 rounded bg-[#050B08] border border-[#00FF66]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs">
+          {/* Verification Stamp */}
+          <div className="p-4 rounded-lg bg-[#07080E] border border-[#03E5B7]/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs glow-teal">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="w-6 h-6 text-[#00FF66]" />
+              <ShieldCheck className="w-6 h-6 text-[#03E5B7]" />
               <div>
-                <div className="font-bold text-white">ECOVERSE BLOCKCHAIN & AI VERIFICATION AUDIT</div>
-                <div className="text-[10px] text-[#527A67]">HASH: 0x8F9A...4B29 • AUDIT SCORE: {selectedReport.impactScore}/1000</div>
+                <span className="font-black text-white text-xs">CRYPTOGRAPHICALLY SIGNED AUDIT CERTIFICATE</span>
+                <p className="text-[10px] text-slate-400 font-mono">Hash: 0x8f4a...93b2 • Verified on Indore Campus Telemetry Chain</p>
               </div>
             </div>
-            <span className="text-[10px] px-3 py-1 rounded bg-[#00FF66]/20 text-[#00FF66] font-bold">
-              STATUS: 100% VERIFIED & AUDITED ✓
+            <span className="text-[10px] px-3 py-1 rounded bg-[#03E5B7]/20 text-[#03E5B7] font-black border border-[#03E5B7]/40">
+              STATUS: COMPLIANT ✓
             </span>
           </div>
         </div>

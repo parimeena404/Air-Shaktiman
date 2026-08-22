@@ -3,7 +3,7 @@ import './globals.css';
 import { EcoProvider } from '../context/EcoContext';
 
 export const metadata: Metadata = {
-  title: 'EcoVerse — AI-Powered Circular Campus Platform',
+  title: 'City Guardian — AI-Powered Circular Campus Platform',
   description: 'Turn Waste Into Impact. AI-powered circular economy platform for college campuses and communities.',
 };
 

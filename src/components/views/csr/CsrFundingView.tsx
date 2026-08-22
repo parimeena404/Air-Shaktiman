@@ -18,15 +18,15 @@ export const CsrFundingView: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 font-mono select-none animate-in fade-in duration-300">
+    <div className="space-y-6 max-w-6xl mx-auto font-mono select-none animate-in fade-in duration-300">
       {/* Header */}
-      <div className="bg-[#09120D] border border-[#F5C518]/40 rounded-lg p-5 space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#F5C518]/20 border border-[#F5C518]/40 text-[#F5C518] text-xs font-bold">
+      <div className="bg-[#0D0F17] border-2 border-[#FFC700] rounded-xl p-6 space-y-2 shadow-2xl glow-gold">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#FFC700]/20 border border-[#FFC700]/40 text-[#FFC700] text-xs font-black">
           <Coins className="w-3.5 h-3.5" />
           <span>CSR CAPITAL ALLOCATION & TRANSPARENCY PIPELINE</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-white tracking-widest">FUNDING CENTER</h1>
-        <p className="text-xs text-[#527A67]">
+        <h1 className="text-3xl font-black text-white tracking-widest">FUNDING CENTER</h1>
+        <p className="text-xs text-slate-300 font-bold">
           Monitor real-time corporate CSR budget deployment, verified financial flows, and project milestone releases.
         </p>
       </div>
@@ -34,78 +34,78 @@ export const CsrFundingView: React.FC = () => {
       {/* Budget Summary Grid */}
       {company && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#09120D] border border-[#F5C518]/40 rounded-lg p-4 space-y-1">
-            <span className="text-[10px] text-[#527A67]">TOTAL CSR FUND</span>
-            <div className="text-xl font-extrabold text-[#F5C518]">₹{company.csrBudgetInr.toLocaleString()}</div>
+          <div className="bg-[#0D0F17] border border-[#FFC700] rounded-xl p-4 space-y-1 shadow-lg">
+            <span className="text-[10px] text-slate-400 font-bold">TOTAL CSR FUND</span>
+            <div className="text-xl font-black text-[#FFC700]">₹{company.csrBudgetInr.toLocaleString()}</div>
           </div>
-          <div className="bg-[#09120D] border border-[#A855F7]/40 rounded-lg p-4 space-y-1">
-            <span className="text-[10px] text-[#527A67]">ALLOCATED CAPITAL</span>
-            <div className="text-xl font-extrabold text-[#A855F7]">₹{company.allocatedInr.toLocaleString()}</div>
+          <div className="bg-[#0D0F17] border border-[#FF007A] rounded-xl p-4 space-y-1 shadow-lg">
+            <span className="text-[10px] text-slate-400 font-bold">ALLOCATED CAPITAL</span>
+            <div className="text-xl font-black text-[#FF007A]">₹{company.allocatedInr.toLocaleString()}</div>
           </div>
-          <div className="bg-[#09120D] border border-[#00FF66]/40 rounded-lg p-4 space-y-1">
-            <span className="text-[10px] text-[#527A67]">REMAINING DEPLOYABLE</span>
-            <div className="text-xl font-extrabold text-[#00FF66]">₹{company.remainingInr.toLocaleString()}</div>
+          <div className="bg-[#0D0F17] border border-[#03E5B7] rounded-xl p-4 space-y-1 shadow-lg">
+            <span className="text-[10px] text-slate-400 font-bold">REMAINING DEPLOYABLE</span>
+            <div className="text-xl font-black text-[#03E5B7]">₹{company.remainingInr.toLocaleString()}</div>
           </div>
-          <div className="bg-[#09120D] border border-[#00F0FF]/40 rounded-lg p-4 space-y-1">
-            <span className="text-[10px] text-[#527A67]">ACTIVE PROJECTS</span>
-            <div className="text-xl font-extrabold text-[#00F0FF]">{company.activeProjects} PROJECTS</div>
+          <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-4 space-y-1 shadow-lg">
+            <span className="text-[10px] text-slate-400 font-bold">ACTIVE PROJECTS</span>
+            <div className="text-xl font-black text-white">{company.activeProjects} PROJECTS</div>
           </div>
         </div>
       )}
 
       {/* 🚀 VISUAL FUNDING PIPELINE TRACKER */}
-      <div className="bg-[#09120D] border border-[#12281D] rounded-lg p-5 space-y-4">
-        <h3 className="text-sm font-extrabold text-white tracking-wider">CSR MISSION FUNDING PIPELINE STAGES</h3>
+      <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-5 space-y-4 shadow-lg">
+        <h3 className="text-xs font-black text-white tracking-wider uppercase">CSR MISSION FUNDING PIPELINE STAGES</h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2">
           {pipelineStages.map((stage, idx) => (
             <div
               key={stage.label}
-              className={`p-3 rounded border text-center space-y-1 ${
+              className={`p-3 rounded-lg border text-center space-y-1 ${
                 stage.status === 'current'
-                  ? 'bg-[#00FF66]/15 border-[#00FF66] text-[#00FF66]'
-                  : 'bg-[#050B08] border-[#12281D] text-[#527A67]'
+                  ? 'bg-[#03E5B7]/15 border-[#03E5B7] text-[#03E5B7] glow-teal'
+                  : 'bg-[#07080E] border-[#1D2133] text-slate-400'
               }`}
             >
               <div className="text-[9px] font-bold">STAGE 0{idx + 1}</div>
               <div className="text-xs font-black text-white">{stage.label}</div>
-              <div className="text-[10px] text-[#00FF66] font-bold">{stage.count} Missions</div>
+              <div className="text-[10px] text-[#03E5B7] font-bold">{stage.count} Missions</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* 📊 FINANCIAL TRANSPARENCY BREAKDOWN FLOW */}
-      <div className="bg-[#09120D] border border-[#12281D] rounded-lg p-5 space-y-4">
-        <h3 className="text-sm font-extrabold text-white tracking-wider">
+      <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-5 space-y-4 shadow-lg">
+        <h3 className="text-xs font-black text-white tracking-wider uppercase">
           FINANCIAL ALLOCATION TRANSPARENCY FLOW (EXAMPLE: ₹5,00,000)
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <div className="p-3 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-            <span className="text-[9px] text-[#527A67]">COLLECTION OPS</span>
-            <div className="text-sm font-bold text-white">₹2,00,000 (40%)</div>
-            <p className="text-[9px] text-[#527A67]">Bins, logistics & gear</p>
+          <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+            <span className="text-[9px] text-[#FF007A] font-bold">COLLECTION OPS</span>
+            <div className="text-sm font-black text-white">₹2,00,000 (40%)</div>
+            <p className="text-[9px] text-slate-400 font-bold">Bins, logistics & gear</p>
           </div>
-          <div className="p-3 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-            <span className="text-[9px] text-[#527A67]">TRANSPORTATION</span>
-            <div className="text-sm font-bold text-white">₹1,00,000 (20%)</div>
-            <p className="text-[9px] text-[#527A67]">EV hauling & fuel</p>
+          <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+            <span className="text-[9px] text-[#03E5B7] font-bold">TRANSPORTATION</span>
+            <div className="text-sm font-black text-white">₹1,00,000 (20%)</div>
+            <p className="text-[9px] text-slate-400 font-bold">EV hauling & fuel</p>
           </div>
-          <div className="p-3 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-            <span className="text-[9px] text-[#527A67]">RECYCLING</span>
-            <div className="text-sm font-bold text-white">₹1,00,000 (20%)</div>
-            <p className="text-[9px] text-[#527A67]">Refining & processing</p>
+          <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+            <span className="text-[9px] text-[#FFC700] font-bold">RECYCLING</span>
+            <div className="text-sm font-black text-white">₹1,00,000 (20%)</div>
+            <p className="text-[9px] text-slate-400 font-bold">Refining & processing</p>
           </div>
-          <div className="p-3 rounded bg-[#050B08] border border-[#12281D] space-y-1">
-            <span className="text-[9px] text-[#527A67]">COMMUNITY</span>
-            <div className="text-sm font-bold text-white">₹50,000 (10%)</div>
-            <p className="text-[9px] text-[#527A67]">Drives & workshops</p>
+          <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+            <span className="text-[9px] text-[#FF007A] font-bold">COMMUNITY REWARDS</span>
+            <div className="text-sm font-black text-white">₹50,000 (10%)</div>
+            <p className="text-[9px] text-slate-400 font-bold">Contestant XP payouts</p>
           </div>
-          <div className="p-3 rounded bg-[#050B08] border border-[#00FF66]/40 space-y-1">
-            <span className="text-[9px] text-[#00FF66] font-bold">PLAYER REWARDS</span>
-            <div className="text-sm font-bold text-[#00FF66]">₹50,000 (10%)</div>
-            <p className="text-[9px] text-[#527A67]">Student cash bounties</p>
+          <div className="p-3.5 rounded-lg bg-[#07080E] border border-[#1D2133] space-y-1">
+            <span className="text-[9px] text-[#03E5B7] font-bold">AUDIT & VERIFICATION</span>
+            <div className="text-sm font-black text-white">₹50,000 (10%)</div>
+            <p className="text-[9px] text-slate-400 font-bold">Third-party ESG audit</p>
           </div>
         </div>
       </div>

@@ -27,6 +27,7 @@ export const CommunityFeedView: React.FC = () => {
   // Create Post Modal State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [postContent, setPostContent] = useState('');
+  const [postImageUrl, setPostImageUrl] = useState('');
   const [postType, setPostType] = useState<'Photo' | 'Contribution' | 'Achievement' | 'Idea' | 'Project' | 'Local Issue' | 'Food Rescue'>('Contribution');
   const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
   const [commentInput, setCommentInput] = useState('');
@@ -42,6 +43,14 @@ export const CommunityFeedView: React.FC = () => {
     'Food Rescue': Utensils,
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPostImageUrl(previewUrl);
+    }
+  };
+
   const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!postContent.trim()) return;
@@ -49,11 +58,13 @@ export const CommunityFeedView: React.FC = () => {
     createSocialPost({
       content: postContent,
       postType,
+      imageUrl: postImageUrl || undefined,
       impactBadge: postType === 'Contribution' ? '8 kg Plastic Diverted' : 'Sustainability Action',
     });
 
     setShowCreateModal(false);
     setPostContent('');
+    setPostImageUrl('');
   };
 
   const handleSendComment = (postId: string) => {
@@ -64,25 +75,25 @@ export const CommunityFeedView: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300">
-      {/* Title */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Title Header */}
+      <div className="bg-[#0D0F17] border-2 border-[#03E5B7] rounded-xl p-6 space-y-2 shadow-2xl glow-teal flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#03E5B7]/15 border border-[#03E5B7]/40 text-[#03E5B7] text-xs font-mono font-bold mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#03E5B7]/20 border border-[#03E5B7]/40 text-[#03E5B7] text-xs font-mono font-black mb-1">
             <Users className="w-3.5 h-3.5" />
-            <span>SUSTAINABILITY SOCIAL NETWORK</span>
+            <span>SUSTAINABILITY SOCIAL NETWORK // CAMPUS FEED</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-white">Community Action Feed</h1>
-          <p className="text-xs text-slate-400">
-            See environmental actions, discoveries, projects, & achievements around your campus.
+          <h1 className="text-3xl font-black text-white font-mono tracking-wide">Community Action Feed</h1>
+          <p className="text-xs text-slate-300 font-mono font-bold">
+            See environmental actions, discoveries, projects, & achievements shared by fellow contestants.
           </p>
         </div>
 
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2.5 rounded-xl bg-[#FF007A] text-white text-xs font-bold glow-pink flex items-center gap-2"
+          className="px-5 py-3 rounded-lg bg-[#FF007A] text-white text-xs font-black font-mono glow-pink flex items-center gap-2 hover:bg-[#FF007A]/90 transition-all shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Create Post (+50 Pts)</span>
+          <span>CREATE POST (+50 PTS)</span>
         </button>
       </div>
 
@@ -153,10 +164,14 @@ export const CommunityFeedView: React.FC = () => {
               {/* Post Text Content */}
               <p className="text-xs text-slate-200 leading-relaxed">{post.content}</p>
 
-              {/* Optional Post Image */}
+              {/* Optional Post Image (Full Uncropped Display) */}
               {post.imageUrl && (
-                <div className="rounded-xl overflow-hidden max-h-72 border border-slate-800">
-                  <img src={post.imageUrl} alt="Post Attachment" className="w-full h-full object-cover" />
+                <div className="rounded-xl overflow-hidden border border-[#1D2133] bg-[#07080E]">
+                  <img
+                    src={post.imageUrl}
+                    alt="Post Attachment"
+                    className="w-full h-auto object-contain max-h-[850px] mx-auto rounded-xl"
+                  />
                 </div>
               )}
 
@@ -276,7 +291,7 @@ export const CommunityFeedView: React.FC = () => {
             <div className="space-y-1">
               <label className="text-xs font-mono text-slate-300">Share something for the planet...</label>
               <textarea
-                rows={4}
+                rows={3}
                 required
                 value={postContent}
                 onChange={(e) => setPostContent(e.target.value)}
@@ -285,7 +300,51 @@ export const CommunityFeedView: React.FC = () => {
               />
             </div>
 
-            <button type="submit" className="w-full py-3 rounded-xl bg-[#FF007A] text-white text-xs font-bold glow-pink">
+            {/* Image Upload Section */}
+            <div className="space-y-1.5 font-mono">
+              <label className="text-xs text-slate-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5 font-bold">
+                  <Camera className="w-3.5 h-3.5 text-[#03E5B7]" />
+                  ATTACH PHOTO / MEDIA
+                </span>
+                <span className="text-[10px] text-slate-500">OPTIONAL</span>
+              </label>
+
+              {postImageUrl ? (
+                <div className="relative rounded-xl overflow-hidden border-2 border-[#03E5B7] max-h-52 bg-[#07080E] p-2 glow-teal">
+                  <img
+                    src={postImageUrl}
+                    alt="Uploaded Post Attachment Preview"
+                    className="w-full h-auto object-contain max-h-48 mx-auto rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPostImageUrl('')}
+                    className="absolute top-3 right-3 p-1.5 rounded-full bg-black/80 text-white hover:bg-red-600 transition-colors shadow-lg border border-slate-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#1D2133] hover:border-[#03E5B7] rounded-2xl cursor-pointer bg-[#07080E] transition-all space-y-2 group">
+                  <div className="w-10 h-10 rounded-full bg-[#03E5B7]/15 border border-[#03E5B7]/40 flex items-center justify-center text-[#03E5B7] group-hover:scale-110 transition-transform glow-teal">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div className="text-center space-y-0.5">
+                    <span className="text-xs font-bold text-white">Click to upload photo or drag & drop</span>
+                    <p className="text-[10px] text-slate-400">Supports PNG, JPG, WEBP</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            <button type="submit" className="w-full py-3 rounded-xl bg-[#FF007A] text-white text-xs font-bold font-mono glow-pink hover:bg-[#FF007A]/90 transition-all">
               Publish Post (+50 Eco Points)
             </button>
           </form>

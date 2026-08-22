@@ -68,7 +68,7 @@ export const OverviewView: React.FC = () => {
 
         <div className="relative z-10">
           <h1 className="text-2xl md:text-3xl font-black text-white tracking-widest flex items-center gap-3">
-            ECOVERSE <span className="text-[#FF007A]">SQUID ARENA</span>
+            CITY GUARDIAN <span className="text-[#FF007A]">SQUID ARENA</span>
           </h1>
           <p className="text-xs text-[#03E5B7] tracking-wider mt-0.5 font-bold">
             "SURVIVE THE WASTE. DIVERT THE RECYCLABLES. WIN THE CASH POOL."

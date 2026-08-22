@@ -14,9 +14,9 @@ export const PartnerNetworkView: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#03E5B7]/15 border border-[#03E5B7]/40 text-[#03E5B7] text-xs font-mono font-bold mb-2">
             <Store className="w-3.5 h-3.5" />
-            <span>ECOVERSE VERIFIED BUSINESS DIRECTORY</span>
+            <span>CITY GUARDIAN VERIFIED BUSINESS DIRECTORY</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-white">EcoVerse Partner Network</h1>
+          <h1 className="text-2xl font-extrabold text-white">City Guardian Partner Network</h1>
           <p className="text-xs text-slate-400">
             Local cafés, restaurants, & businesses supporting sustainable campus communities.
           </p>

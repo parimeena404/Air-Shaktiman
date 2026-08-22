@@ -27,7 +27,7 @@ export const GovernmentConnectView: React.FC = () => {
           </div>
           <h1 className="text-2xl font-extrabold text-white">Government & Civic Integration</h1>
           <p className="text-xs text-slate-400">
-            Connect EcoVerse campus activities with India's national environmental framework & statutory programs.
+            Connect City Guardian campus activities with India's national environmental framework & statutory programs.
           </p>
         </div>
 
@@ -71,47 +71,41 @@ export const GovernmentConnectView: React.FC = () => {
         </div>
       </div>
 
-      {/* Government Program Resource Cards */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-mono text-slate-400 font-bold tracking-wider">
-          OFFICIAL STATUTORY PROGRAMS & GUIDELINES
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {governmentPrograms.map((prog) => (
-            <div
-              key={prog.id}
-              className="bg-squid-card bg-squid-card-hover rounded-2xl p-6 border border-slate-800 space-y-4 flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#FF007A]">{prog.organization}</span>
-                  <span className="text-[9px] px-2 py-0.5 rounded bg-[#03E5B7]/20 text-[#03E5B7] font-mono font-bold">
-                    {prog.status}
-                  </span>
-                </div>
-
-                <h4 className="font-bold text-white text-base leading-snug">{prog.programName}</h4>
-                <p className="text-xs text-slate-300">{prog.coverage}</p>
-
-                <div className="p-3 rounded-xl bg-[#07080E] border border-slate-800 text-xs text-[#03E5B7]">
-                  <strong className="text-white">EcoVerse Alignment:</strong> {prog.ecoverseAlignment}
-                </div>
+      {/* Statutory Programs Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {governmentPrograms.map((prog) => (
+          <div
+            key={prog.id}
+            className="bg-squid-card border border-slate-800 rounded-2xl p-6 space-y-4 flex flex-col justify-between"
+          >
+            <div className="space-y-3 font-mono">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400">{prog.organization}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-[#03E5B7]/15 text-[#03E5B7] font-bold">
+                  {prog.status}
+                </span>
               </div>
 
-              <a
-                href={prog.portalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-bold hover:border-[#FF007A] hover:text-[#FF007A] transition-colors flex items-center justify-center gap-2"
-              >
-                <span>Open Official Government Portal</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              <h4 className="font-bold text-white text-base leading-snug">{prog.programName}</h4>
+              <p className="text-xs text-slate-300">{prog.coverage}</p>
+
+              <div className="p-3 rounded-xl bg-[#07080E] border border-slate-800 text-xs text-[#03E5B7]">
+                <strong className="text-white">City Guardian Alignment:</strong> {prog.ecoverseAlignment}
+              </div>
             </div>
+
+            <a
+              href={prog.portalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-bold hover:border-[#FF007A] hover:text-[#FF007A] transition-colors flex items-center justify-center gap-2"
+            >
+              <span>Open Official Government Portal</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
           ))}
         </div>
-      </div>
     </div>
   );
 };
