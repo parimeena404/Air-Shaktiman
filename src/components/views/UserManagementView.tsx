@@ -5,9 +5,11 @@ import { useEco } from '../../context/EcoContext';
 import { Users, Filter, CheckCircle2, Award, Shield, Search } from 'lucide-react';
 
 export const UserManagementView: React.FC = () => {
-  const { leaderboard } = useEco();
+  const { leaderboard, profile, promoteToAdmin, addToast } = useEco();
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [promoteEmail, setPromoteEmail] = useState('');
+  const [isPromoting, setIsPromoting] = useState(false);
 
   const filterTabs = ['All', 'Students', 'Volunteers', 'Organizations', 'Businesses', 'NGOs', 'Administrators'];
 
@@ -16,6 +18,30 @@ export const UserManagementView: React.FC = () => {
     const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.playerNumber.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const handlePromoteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoteEmail) return;
+    setIsPromoting(true);
+    try {
+      await promoteToAdmin(promoteEmail);
+      setPromoteEmail('');
+    } catch (err: any) {
+      addToast(err.message || 'Failed to promote user', 'warning');
+    } finally {
+      setIsPromoting(false);
+    }
+  };
+
+  const handlePromoteUserRow = async (target: string) => {
+    try {
+      await promoteToAdmin(target);
+    } catch (err: any) {
+      addToast(err.message || 'Failed to promote user', 'warning');
+    }
+  };
+
+  const isAdmin = profile.role === 'admin';
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -30,6 +56,33 @@ export const UserManagementView: React.FC = () => {
           Inspect, manage, & verify registered citizens, students, businesses, & NGOs across City Guardian.
         </p>
       </div>
+
+      {/* Admin Quick Promotion Card (Visible only to Admins) */}
+      {isAdmin && (
+        <div className="p-4 rounded-xl bg-[#180B1B] border border-[#FF007A]/40 space-y-3 font-sans shadow-lg glow-pink">
+          <div className="flex items-center gap-2 text-white font-mono font-bold text-sm">
+            <Shield className="w-4 h-4 text-[#FF007A]" />
+            <span>FRONT MAN COMMAND // GRANT ADMIN PRIVILEGES</span>
+          </div>
+          <form onSubmit={handlePromoteSubmit} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={promoteEmail}
+              onChange={(e) => setPromoteEmail(e.target.value)}
+              placeholder="Enter user email address or player number (#456)..."
+              className="flex-1 bg-[#07080E] border border-[#FF007A]/40 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#FF007A]"
+            />
+            <button
+              type="submit"
+              disabled={isPromoting || !promoteEmail}
+              className="px-4 py-2 rounded-lg bg-[#FF007A] text-white font-mono font-bold text-xs hover:bg-[#FF007A]/80 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>{isPromoting ? 'PROMOTING...' : 'MAKE ADMIN'}</span>
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Search & Category Filter Pills */}
       <div className="space-y-4">
@@ -87,6 +140,16 @@ export const UserManagementView: React.FC = () => {
                   Verified Contributor ✓
                 </span>
                 <span className="font-mono text-white font-bold">{user.points} Pts</span>
+                {isAdmin && (
+                  <button
+                    onClick={() => handlePromoteUserRow(user.playerNumber)}
+                    className="px-2.5 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] hover:bg-[#FF007A] hover:text-white transition-all text-[10px] font-mono font-bold flex items-center gap-1"
+                    title="Promote user to Admin (FRONT MAN)"
+                  >
+                    <Shield className="w-3 h-3" />
+                    <span>MAKE ADMIN</span>
+                  </button>
+                )}
               </div>
             </div>
           ))}

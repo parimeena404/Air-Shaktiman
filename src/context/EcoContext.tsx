@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   UserRole,
   MainTab,
@@ -32,6 +33,7 @@ import {
   CsrMission,
   CsrProject,
   CsrReport,
+  UserActivityLogItem,
 } from '../types';
 import {
   initialUserProfile,
@@ -121,8 +123,9 @@ interface EcoContextType {
   reportWaste: (report: Partial<WasteReport>) => void;
   verifyWasteReport: (id: string, approve: boolean) => void;
   listMarketItem: (item: Partial<MarketItem>) => void;
-  offerMaterialToIndustry: (demandId: string, quantityKg: number) => void;
+  offerMaterialToIndustry: (demandId: string, quantityKg: number) => any;
   joinCommunityProject: (projectId: string) => void;
+  createCommunityProject: (project: Partial<CommunityProject>) => void;
   donateToProject: (projectId: string, itemLabel: string) => void;
   joinChallenge: (challengeId: string) => void;
   redeemReward: (rewardId: string) => void;
@@ -133,7 +136,7 @@ interface EcoContextType {
   // Add-On Actions
   reserveSurplusFood: (foodId: string) => void;
   listSurplusFood: (listing: Partial<SurplusFoodListing>) => void;
-  offerFoodToNGO: (foodId: string, ngoId: string) => void;
+  offerFoodToNGO: (ngoId: string, details?: { phone?: string; location?: string; remarks?: string }) => void;
   reportCivicIssue: (issue: Partial<CivicReport>) => void;
   assignCleanup: (operationId: string, teamName: string) => void;
   approveFoodListing: (id: string) => void;
@@ -145,28 +148,156 @@ interface EcoContextType {
   toggleLikePost: (postId: string) => void;
   addPostComment: (postId: string, text: string) => void;
   createSocialPost: (post: Partial<SocialPost>) => void;
-  toggleFollowUser: () => void;
+  toggleFollowUser: (targetAuthorName?: string) => void;
   joinClubGroup: (clubId: string) => void;
   rsvpEvent: (eventId: string) => void;
 
   // CSR Corporate Actions
   fundCsrProject: (projectId: string, amountInr: number) => void;
   joinCsrMission: (missionId: string) => void;
+
+  // Authentication & Auth Modal State
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (name: string, email: string, pass: string, userRole?: string) => Promise<void>;
+  logout: () => void;
+  promoteToAdmin: (emailOrId: string) => Promise<void>;
+  updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
+  uploadImageToCloudinary: (fileOrBase64: File | string) => Promise<string>;
+  addEcoPoints: (amount: number, reason?: string) => Promise<void>;
+  userActivityLog: UserActivityLogItem[];
+  logUserActivity: (item: Omit<UserActivityLogItem, 'id' | 'timestamp'>) => void;
 }
 
 const EcoContext = createContext<EcoContextType | undefined>(undefined);
 
+export const computeLevelFromPoints = (points: number = 0): string => {
+  if (points >= 2500) return 'Grandmaster Guardian (Tier 5)';
+  if (points >= 1000) return 'Eco Champion (Tier 4)';
+  if (points >= 500) return 'Eco Vanguard (Tier 3)';
+  if (points >= 100) return 'Eco Survivor (Tier 2)';
+  return 'Rookie Contestant (Tier 1)';
+};
+
 export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  // Auth State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('ecoverse_token');
+      if (savedToken) {
+        setToken(savedToken);
+      }
+      const savedProfile = localStorage.getItem('ecoverse_profile');
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          if (parsed && parsed.name) {
+            setProfileState(parsed);
+          }
+        } catch (e) {}
+      }
+      const savedVouchers = localStorage.getItem('ecoverse_vouchers');
+      if (savedVouchers) {
+        try {
+          const parsedV = JSON.parse(savedVouchers);
+          if (Array.isArray(parsedV) && parsedV.length > 0) {
+            setRedeemedVouchers(parsedV);
+          }
+        } catch (e) {}
+      }
+      const savedActivity = localStorage.getItem('ecoverse_user_activity');
+      if (savedActivity) {
+        try {
+          const parsedA = JSON.parse(savedActivity);
+          if (Array.isArray(parsedA)) {
+            setUserActivityLog(parsedA);
+          }
+        } catch (e) {}
+      }
+      const savedDemands = localStorage.getItem('ecoverse_industry_demands');
+      if (savedDemands) {
+        try {
+          const parsedD = JSON.parse(savedDemands);
+          if (Array.isArray(parsedD) && parsedD.length > 0) {
+            setIndustryDemands(parsedD);
+          }
+        } catch (e) {}
+      }
+      const savedProjects = localStorage.getItem('ecoverse_community_projects');
+      if (savedProjects) {
+        try {
+          const parsedP = JSON.parse(savedProjects);
+          if (Array.isArray(parsedP) && parsedP.length > 0) {
+            setCommunityProjects(parsedP);
+          }
+        } catch (e) {}
+      }
+    }
+  }, []);
+
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [role, setRole] = useState<UserRole>('student');
-  const [activeTab, setActiveTab] = useState<MainTab>('overview');
-  const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
+  const [activeTabState, setActiveTabState] = useState<MainTab>('overview');
+
+  useEffect(() => {
+    if (pathname) {
+      const routeTab = pathname.replace(/^\//, '') as MainTab;
+      if (routeTab && routeTab !== activeTabState) {
+        setActiveTabState(routeTab);
+      } else if (!routeTab && activeTabState !== 'overview') {
+        setActiveTabState('overview');
+      }
+    }
+  }, [pathname]);
+
+  const setActiveTab = (tab: MainTab) => {
+    setActiveTabState(tab);
+    const targetPath = tab === 'overview' ? '/' : `/${tab}`;
+    if (pathname !== targetPath) {
+      router.push(targetPath, { scroll: false });
+    }
+  };
+
+  const activeTab = activeTabState;
+  const [profileState, setProfileState] = useState<UserProfile>(initialUserProfile);
+
+  const setProfile = (
+    updater: UserProfile | ((prev: UserProfile) => UserProfile),
+  ) => {
+    setProfileState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      const updated = {
+        ...next,
+        level: computeLevelFromPoints(next.ecoPoints ?? 0),
+      };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_profile', JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const profile = profileState;
   const [wasteReports, setWasteReports] = useState<WasteReport[]>(initialWasteReports);
   const [marketItems, setMarketItems] = useState<MarketItem[]>(initialMarketItems);
-  const [industryDemands] = useState<IndustryDemand[]>(initialIndustryDemands);
+  const [industryDemands, setIndustryDemands] = useState<IndustryDemand[]>(initialIndustryDemands);
   const [buildIdeas] = useState<BuildIdea[]>(initialBuildIdeas);
   const [communityProjects, setCommunityProjects] = useState<CommunityProject[]>(initialCommunityProjects);
   const [challenges, setChallenges] = useState<EcoChallenge[]>(initialChallenges);
@@ -198,6 +329,367 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [csrMissions, setCsrMissions] = useState<CsrMission[]>(initialCsrMissions);
   const [csrProjects, setCsrProjects] = useState<CsrProject[]>(initialCsrProjects);
   const [csrReports, setCsrReports] = useState<CsrReport[]>(initialCsrReports);
+
+  // Fetch initial backend data for live collections and merge with dummy items
+  useEffect(() => {
+    fetch(`${API_URL}/reports`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setWasteReports((prev) => {
+            const dbIds = new Set(data.map((d: any) => d._id || d.id));
+            const dummyItems = initialWasteReports.filter((d) => !dbIds.has(d.id));
+            return [...data, ...dummyItems];
+          });
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/posts`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSocialPosts((prev) => {
+            const dbIds = new Set(data.map((d: any) => d._id || d.id));
+            const dummyItems = initialSocialPosts.filter((d) => !dbIds.has(d.id));
+            return [...data, ...dummyItems];
+          });
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/market`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setMarketItems((prev) => {
+            const dbIds = new Set(data.map((d: any) => d._id || d.id));
+            const dummyItems = initialMarketItems.filter((d) => !dbIds.has(d.id));
+            return [...data, ...dummyItems];
+          });
+        }
+      })
+      .catch(() => {});
+
+    fetch(`${API_URL}/food`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSurplusFoodListings((prev) => {
+            const dbIds = new Set(data.map((d: any) => d._id || d.id));
+            const dummyItems = initialSurplusFoodListings.filter((d) => !dbIds.has(d.id));
+            return [...data, ...dummyItems];
+          });
+        }
+      })
+      .catch(() => {});
+  }, [API_URL]);
+
+  const uploadImageToCloudinary = async (fileOrBase64: File | string): Promise<string> => {
+    try {
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('http')) {
+        return fileOrBase64;
+      }
+
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:')) {
+        const res = await fetch(`${API_URL}/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: fileOrBase64 }),
+        });
+        const data = await res.json();
+        if (res.ok && data.url) return data.url;
+      } else if (fileOrBase64 instanceof File) {
+        const formData = new FormData();
+        formData.append('file', fileOrBase64);
+        const res = await fetch(`${API_URL}/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok && data.url) return data.url;
+      }
+    } catch (e) {
+      console.error('Cloudinary upload error:', e);
+    }
+    return typeof fileOrBase64 === 'string' ? fileOrBase64 : '';
+  };
+
+  const addEcoPoints = async (amount: number, reason?: string) => {
+    if (amount === 0) return;
+
+    setProfile((prev) => {
+      const newPoints = Math.max(0, (prev.ecoPoints || 0) + amount);
+      const newScore = amount > 0 ? (prev.sustainabilityScore || 0) + Math.round(amount / 2) : prev.sustainabilityScore;
+      const updated = {
+        ...prev,
+        ecoPoints: newPoints,
+        sustainabilityScore: newScore,
+      };
+
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ecoPoints: newPoints,
+            sustainabilityScore: newScore,
+          }),
+        }).catch(() => {});
+      }
+
+      return updated;
+    });
+
+    if (reason && amount > 0) {
+      addToast(`✨ +${amount} Eco Points earned for ${reason}! Total: ${(profile.ecoPoints + amount)} Pts`, 'success');
+    }
+  };
+
+  const [userActivityLog, setUserActivityLog] = useState<UserActivityLogItem[]>([]);
+
+  const logUserActivity = (item: Omit<UserActivityLogItem, 'id' | 'timestamp'>) => {
+    const newItem: UserActivityLogItem = {
+      id: 'ACT-' + Date.now(),
+      timestamp: 'Just now',
+      ...item,
+    };
+
+    setUserActivityLog((prev) => {
+      const updated = [newItem, ...prev];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_user_activity', JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    setProfile((prev) => {
+      const addedPoints = item.points || 0;
+      const newEcoPoints = (prev.ecoPoints || 0) + addedPoints;
+      const newContributions = (prev.communityContributions || 0) + 1;
+      const newScore = addedPoints > 0 ? (prev.sustainabilityScore || 0) + Math.round(addedPoints / 2) : prev.sustainabilityScore;
+      const updated = {
+        ...prev,
+        ecoPoints: newEcoPoints,
+        sustainabilityScore: newScore,
+        communityContributions: newContributions,
+        level: computeLevelFromPoints(newEcoPoints),
+      };
+
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ecoPoints: newEcoPoints,
+            sustainabilityScore: newScore,
+            communityContributions: newContributions,
+            level: updated.level,
+          }),
+        }).catch(() => {});
+      }
+
+      return updated;
+    });
+  };
+
+  // Sync token profile from backend
+  useEffect(() => {
+    if (token) {
+      fetch(`${API_URL}/auth/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((userData) => {
+          if (userData) {
+            setProfile((prev) => {
+              const maxEcoPoints = Math.max(prev.ecoPoints || 0, userData.ecoPoints ?? 0);
+              const maxContributions = Math.max(prev.communityContributions || 0, userData.communityContributions ?? 0);
+              const maxWaste = Math.max(prev.wasteRecoveredKg || 0, userData.wasteRecoveredKg ?? 0);
+              const maxScore = Math.max(prev.sustainabilityScore || 0, userData.sustainabilityScore ?? 0);
+
+              const updated = {
+                ...prev,
+                name: userData.name,
+                playerNumber: userData.playerNumber,
+                ecoPoints: maxEcoPoints,
+                sustainabilityScore: maxScore,
+                wasteRecoveredKg: maxWaste,
+                co2SavedKg: Math.max(prev.co2SavedKg || 0, userData.co2SavedKg ?? 0),
+                communityContributions: maxContributions,
+                followersCount: userData.followersCount ?? 0,
+                followingCount: userData.followingCount ?? 0,
+                level: computeLevelFromPoints(maxEcoPoints),
+                avatar: userData.avatar || prev.avatar,
+                role: userData.role || prev.role,
+              };
+
+              // If local points were higher than backend, sync the higher points back to backend
+              if (maxEcoPoints > (userData.ecoPoints ?? 0)) {
+                fetch(`${API_URL}/auth/profile`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    ecoPoints: maxEcoPoints,
+                    sustainabilityScore: maxScore,
+                    communityContributions: maxContributions,
+                    wasteRecoveredKg: maxWaste,
+                    level: updated.level,
+                  }),
+                }).catch(() => {});
+              }
+
+              return updated;
+            });
+
+            if (userData.role) {
+              setRole(userData.role as UserRole);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [token, API_URL]);
+
+  const login = async (email: string, pass: string) => {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+    setToken(data.token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ecoverse_token', data.token);
+    }
+    if (data.user) {
+      setProfile((prev) => ({
+        ...prev,
+        name: data.user.name,
+        playerNumber: data.user.playerNumber,
+        ecoPoints: data.user.ecoPoints ?? 0,
+        sustainabilityScore: data.user.sustainabilityScore ?? 0,
+        wasteRecoveredKg: data.user.wasteRecoveredKg ?? 0,
+        co2SavedKg: data.user.co2SavedKg ?? 0,
+        communityContributions: data.user.communityContributions ?? 0,
+        followersCount: data.user.followersCount ?? 0,
+        followingCount: data.user.followingCount ?? 0,
+        level: data.user.level || 'Rookie Contestant (Tier 1)',
+        avatar: data.user.avatar || prev.avatar,
+        role: data.user.role || prev.role,
+      }));
+      if (data.user.role) {
+        setRole(data.user.role as UserRole);
+      }
+    }
+    addToast('Login successful! Welcome back.', 'success');
+  };
+
+  const register = async (name: string, email: string, pass: string, userRole: string = 'student') => {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password: pass, role: userRole }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'Registration failed');
+    }
+    setToken(data.token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ecoverse_token', data.token);
+    }
+    if (data.user) {
+      setProfile((prev) => ({
+        ...prev,
+        name: data.user.name,
+        playerNumber: data.user.playerNumber,
+        ecoPoints: data.user.ecoPoints ?? 0,
+        sustainabilityScore: data.user.sustainabilityScore ?? 0,
+        wasteRecoveredKg: data.user.wasteRecoveredKg ?? 0,
+        co2SavedKg: data.user.co2SavedKg ?? 0,
+        communityContributions: data.user.communityContributions ?? 0,
+        followersCount: data.user.followersCount ?? 0,
+        followingCount: data.user.followingCount ?? 0,
+        level: data.user.level || 'Rookie Contestant (Tier 1)',
+        avatar: data.user.avatar || prev.avatar,
+        role: data.user.role || prev.role,
+      }));
+      if (data.user.role) {
+        setRole(data.user.role as UserRole);
+      }
+    }
+    addToast('Account created successfully!', 'success');
+  };
+
+  const logout = () => {
+    setToken(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('ecoverse_token');
+      localStorage.removeItem('ecoverse_profile');
+    }
+    setRole('student');
+    setProfile(initialUserProfile);
+    addToast('Logged out of EcoVerse', 'info');
+  };
+
+  const promoteToAdmin = async (emailOrId: string) => {
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    const res = await fetch(`${API_URL}/auth/promote-admin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ emailOrId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to promote user to Admin');
+    }
+    addToast(data.message || `Promoted ${emailOrId} to Admin!`, 'success');
+  };
+
+  const updateUserProfile = async (updatedData: Partial<UserProfile>) => {
+    setProfile((prev) => ({ ...prev, ...updatedData }));
+
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedData),
+        });
+        const data = await res.json();
+        if (res.ok && data.user) {
+          setProfile((prev) => ({
+            ...prev,
+            name: data.user.name || prev.name,
+            avatar: data.user.avatar || prev.avatar,
+            playerNumber: data.user.playerNumber || prev.playerNumber,
+          }));
+        }
+      } catch (e) {}
+    }
+    addToast('Profile updated successfully!', 'success');
+  };
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -231,25 +723,52 @@ Options available:
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const reportWaste = (newReport: Partial<WasteReport>) => {
-    const report: WasteReport = {
-      id: 'RPT-' + Math.floor(1000 + Math.random() * 9000),
+  const reportWaste = async (newReport: Partial<WasteReport>) => {
+    let imageUrl = newReport.imageUrl || 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&q=80&w=600';
+    if (newReport.imageUrl) {
+      const uploadedUrl = await uploadImageToCloudinary(newReport.imageUrl);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
+    const payload = {
       title: newReport.title || 'Reported Waste Site',
       location: newReport.location || 'Block B, North Gate',
       detectedMaterials: newReport.detectedMaterials || ['Plastic', 'Cardboard'],
       estimatedQuantityKg: newReport.estimatedQuantityKg || 12.0,
       severity: newReport.severity || 'High',
       recyclablePercentage: newReport.recyclablePercentage || 78,
-      status: 'Reported',
+      status: 'Reported' as WasteReport['status'],
       reportedBy: `${profile.name} (${profile.playerNumber})`,
-      timestamp: 'Just now',
       pointsAwarded: 10,
-      imageUrl: newReport.imageUrl || 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&q=80&w=600',
+      imageUrl,
       nearestCollectionPoint: 'Eco Hub #2',
       distanceMeters: 240,
     };
 
-    setWasteReports((prev) => [report, ...prev]);
+    let savedReport: WasteReport = {
+      id: 'RPT-' + Math.floor(1000 + Math.random() * 9000),
+      ...payload,
+      timestamp: 'Just now',
+    };
+
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/reports`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data) {
+          savedReport = { ...data, id: data._id || savedReport.id };
+        }
+      } catch (e) {}
+    }
+
+    setWasteReports((prev) => [savedReport, ...prev]);
     setProfile((prev) => ({
       ...prev,
       ecoPoints: prev.ecoPoints + 10,
@@ -257,56 +776,207 @@ Options available:
       communityContributions: prev.communityContributions + 1,
     }));
 
-    addToast('🎯 Waste report submitted! +10 Eco Points added.', 'success');
+    logUserActivity({
+      title: savedReport.title,
+      location: savedReport.location,
+      type: 'Waste Reports',
+      details: `Reported waste site (${savedReport.estimatedQuantityKg} kg)`,
+      status: 'Submitted',
+      points: 10,
+      badge: '📷 Waste Report',
+      imageUrl: savedReport.imageUrl,
+      icon: '♻',
+    });
+
+    addToast('📍 Waste Report submitted! +10 Eco Points & +5 XP added', 'success');
   };
 
-  const verifyWasteReport = (id: string, approve: boolean) => {
+  const verifyWasteReport = async (id: string, approve: boolean) => {
     setWasteReports((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status: approve ? 'Cleaned' : 'Rejected' } : r))
     );
+
+    if (token) {
+      try {
+        await fetch(`${API_URL}/reports/${id}/verify`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ approve }),
+        });
+      } catch (e) {}
+    }
+
     if (approve) {
       setProfile((prev) => ({
         ...prev,
-        wasteRecoveredKg: parseFloat((prev.wasteRecoveredKg + 12).toFixed(1)),
         ecoPoints: prev.ecoPoints + 50,
+        wasteRecoveredKg: prev.wasteRecoveredKg + 12.0,
+        co2SavedKg: prev.co2SavedKg + 18.4,
       }));
-      addToast(`⚡ Report ${id} verified & cleaned! +50 Eco Points granted.`, 'success');
+      addToast('✅ Report verified & cleaned! +50 Eco Points awarded.', 'success');
     }
   };
 
-  const listMarketItem = (item: Partial<MarketItem>) => {
-    const newItem: MarketItem = {
-      id: 'MKT-' + Math.floor(10 + Math.random() * 90),
+  const listMarketItem = async (item: Partial<MarketItem>) => {
+    let imageUrl = item.imageUrl || 'https://images.unsplash.com/photo-1605557202138-097824c3fdb2?auto=format&fit=crop&q=80&w=600';
+    if (item.imageUrl) {
+      const uploadedUrl = await uploadImageToCloudinary(item.imageUrl);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
+    const payload = {
       title: item.title || 'Recyclable Material',
       category: item.category || 'E-Waste',
-      quantity: item.quantity || '10 kg',
       priceInr: item.priceInr || 1500,
-      location: item.location || 'Indore Campus Tech Lab',
-      sellerName: `${profile.name} (${profile.playerNumber})`,
+      pointsCost: item.pointsCost || 0,
+      ecoPointsBonus: 50,
+      sellerName: profile.name,
+      sellerRole: 'Contestant',
       sellerAvatar: profile.avatar,
+      sellerPlayerNumber: profile.playerNumber,
+      location: item.location || 'Indore Campus Tech Lab',
       condition: item.condition || 'Good',
-      imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1605557202138-097824c3fdb2?auto=format&fit=crop&q=80&w=600',
+      description: item.description || 'High quality upcycled item saved from landfill.',
+      imageUrl,
+      isSold: false,
+    };
+
+    let newItem: MarketItem = {
+      id: 'MKT-' + Math.floor(10 + Math.random() * 90),
+      quantity: item.quantity || '10 kg',
       pickupAvailable: true,
       postedTime: 'Just now',
+      ...payload,
     };
-    setMarketItems((prev) => [newItem, ...prev]);
-    addToast('🛒 Published to EcoMarket!', 'success');
-  };
 
-  const offerMaterialToIndustry = (demandId: string, quantityKg: number) => {
-    const demand = industryDemands.find((d) => d.id === demandId);
-    const earned = quantityKg * (demand?.offerPricePerKgInr || 300);
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/market`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data) {
+          newItem = { ...data, id: data._id || newItem.id, quantity: item.quantity || '10 kg' };
+        }
+      } catch (e) {}
+    }
+
+    setMarketItems((prev) => [newItem, ...prev]);
     setProfile((prev) => ({
       ...prev,
-      ecoPoints: prev.ecoPoints + 150,
-      wasteRecoveredKg: parseFloat((prev.wasteRecoveredKg + quantityKg).toFixed(1)),
+      ecoPoints: prev.ecoPoints + 50,
+      communityContributions: prev.communityContributions + 1,
     }));
-    addToast(`⚡ Material offer dispatched to ${demand?.companyName}! Est payout ₹${earned}. +150 Pts!`, 'success');
+
+    logUserActivity({
+      title: newItem.title,
+      location: newItem.location,
+      type: 'Recycling',
+      details: `${newItem.category} listed for sale (${newItem.quantity})`,
+      status: 'Listed',
+      points: 50,
+      badge: '🛒 EcoMarket',
+      imageUrl: newItem.imageUrl,
+      icon: '🛍️',
+    });
+
+    addToast('🛒 Published to EcoMarket! +50 Eco Points credited.', 'success');
+  };
+
+  const offerMaterialToIndustry = (demandId: string, requestedQuantityKg: number) => {
+    const demand = industryDemands.find((d) => d.id === demandId);
+    const maxRemaining = demand?.remainingQuantityKg ?? 500;
+    const actualQuantityKg = Math.min(requestedQuantityKg, maxRemaining);
+
+    const pricePerKg = demand?.offerPricePerKgInr || 300;
+    const totalEarnedInr = actualQuantityKg * pricePerKg;
+    const pointsAwarded = Math.max(50, Math.round(actualQuantityKg * 10));
+
+    const tokenCode = `IND-B2B-${Math.floor(1000 + Math.random() * 9000)}-TOK`;
+
+    // Deduct offered quantity from remaining demand
+    setIndustryDemands((prev) => {
+      const updated = prev.map((d) => {
+        if (d.id === demandId) {
+          const newRemaining = Math.max(0, (d.remainingQuantityKg ?? 500) - actualQuantityKg);
+          return {
+            ...d,
+            remainingQuantityKg: newRemaining,
+            requiredQuantity: `${newRemaining} kg remaining`,
+          };
+        }
+        return d;
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_industry_demands', JSON.stringify(updated));
+      }
+
+      return updated;
+    });
+
+    setProfile((prev) => {
+      const newPoints = prev.ecoPoints + pointsAwarded;
+      const newWaste = parseFloat(((prev.wasteRecoveredKg || 0) + actualQuantityKg).toFixed(1));
+      const updated = {
+        ...prev,
+        ecoPoints: newPoints,
+        wasteRecoveredKg: newWaste,
+        communityContributions: (prev.communityContributions || 0) + 1,
+      };
+
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ecoPoints: newPoints,
+            wasteRecoveredKg: newWaste,
+            communityContributions: updated.communityContributions,
+          }),
+        }).catch(() => {});
+      }
+
+      return updated;
+    });
+
+    logUserActivity({
+      title: `B2B Material Offer (${demand?.companyName || 'Corporate Partner'})`,
+      location: 'Indore Industrial Zone',
+      type: 'Recycling',
+      details: `Offered ${actualQuantityKg} kg of ${demand?.materialNeeded || 'Scrap Material'} (Token: ${tokenCode})`,
+      status: 'Token Issued',
+      points: pointsAwarded,
+      badge: '⚡ B2B Offer',
+      icon: '🏬',
+    });
+
+    addToast(`⚡ Material offer dispatched! Token ${tokenCode} issued (+${pointsAwarded} Pts, est payout ₹${totalEarnedInr})`, 'success');
+
+    return {
+      tokenCode,
+      quantityKg: actualQuantityKg,
+      totalEarnedInr,
+      pointsAwarded,
+      companyName: demand?.companyName || 'Corporate Partner',
+      materialNeeded: demand?.materialNeeded || 'Scrap Material',
+    };
   };
 
   const joinCommunityProject = (projectId: string) => {
-    setCommunityProjects((prev) =>
-      prev.map((p) => {
+    setCommunityProjects((prev) => {
+      const updated = prev.map((p) => {
         if (p.id === projectId) {
           return {
             ...p,
@@ -318,27 +988,108 @@ Options available:
           };
         }
         return p;
-      })
-    );
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_community_projects', JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: 'Joined Guild Project',
+      location: 'Campus Eco Hub',
+      type: 'Projects',
+      details: 'Joined student eco project squad team',
+      status: 'Active',
+      points: 25,
+      badge: '🌱 Guild Squad',
+      icon: '🌱',
+    });
+
     addToast('🤝 You joined the Guild Project team! +25 Eco Points.', 'success');
   };
 
+  const createCommunityProject = (project: Partial<CommunityProject>) => {
+    const target = project.materialsTarget || 100;
+    const unit = project.materialsUnit || 'Items';
+
+    const newProject: CommunityProject = {
+      id: 'PROJ-' + Math.floor(1000 + Math.random() * 9000),
+      title: project.title || 'Campus Guild Project',
+      description: project.description || 'Community waste upcycling initiative.',
+      creatorName: profile.name,
+      creatorAvatar: profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+      materialsTarget: target,
+      materialsCurrent: 0,
+      materialsUnit: unit,
+      reusedImpactLabel: project.reusedImpactLabel || `${target} ${unit} Target`,
+      materialsList: project.materialsList || ['Recyclable Scrap', 'PET Plastic Bottles', 'PVC Pipes'],
+      studentsJoined: 1,
+      progressPercentage: 0,
+      recentActivity: [
+        { user: `${profile.name} (${profile.playerNumber})`, action: 'created the Guild Project', time: 'Just now' },
+      ],
+    };
+
+    setCommunityProjects((prev) => {
+      const updated = [newProject, ...prev];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_community_projects', JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: `Guild Project: ${newProject.title}`,
+      location: 'Indore Campus',
+      type: 'Projects',
+      details: `Created new Guild Project (${newProject.reusedImpactLabel})`,
+      status: 'Created',
+      points: 50,
+      badge: '🌱 Guild Project',
+      icon: '🌱',
+    });
+
+    addToast(`🚀 Guild Project "${newProject.title}" published! +50 Eco Points earned.`, 'success');
+  };
+
   const donateToProject = (projectId: string, itemLabel: string) => {
-    setCommunityProjects((prev) =>
-      prev.map((p) => {
+    setCommunityProjects((prev) => {
+      const updated = prev.map((p) => {
         if (p.id === projectId) {
           const newCurrent = Math.min(p.materialsTarget, p.materialsCurrent + 10);
           return {
             ...p,
             materialsCurrent: newCurrent,
             progressPercentage: Math.round((newCurrent / p.materialsTarget) * 100),
+            recentActivity: [
+              { user: `${profile.name} (${profile.playerNumber})`, action: `donated ${itemLabel}`, time: 'Just now' },
+              ...p.recentActivity,
+            ],
           };
         }
         return p;
-      })
-    );
-    setProfile((prev) => ({ ...prev, ecoPoints: prev.ecoPoints + 100 }));
-    addToast(`🎁 Donated ${itemLabel}! +100 Eco Points.`, 'success');
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_community_projects', JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: 'Material Donation to Guild Project',
+      location: 'Campus Eco Hub',
+      type: 'Projects',
+      details: `Donated ${itemLabel} to community project`,
+      status: 'Donated',
+      points: 100,
+      badge: '🎁 Material Donation',
+      icon: '🎁',
+    });
+
+    addToast(`🎁 Donated ${itemLabel}! +100 Eco Points credited.`, 'success');
   };
 
   const joinChallenge = (challengeId: string) => {
@@ -360,7 +1111,9 @@ Options available:
     redeemPartnerVoucher(reward.title, reward.businessName || 'Partner', reward.pointsCost, reward.discountInr || 50);
   };
 
-  const sendChatMessage = (text: string) => {
+  const sendChatMessage = async (text: string) => {
+    if (!text.trim()) return;
+
     const userMsg: ChatMessage = {
       id: 'msg-' + Date.now(),
       sender: 'user',
@@ -368,14 +1121,34 @@ Options available:
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    const aiMsg: ChatMessage = {
-      id: 'msg-' + (Date.now() + 1),
-      sender: 'ai',
-      text: `Analyzed "${text}": Options updated across nearby map & marketplace.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
+    setChatMessages((prev) => [...prev, userMsg]);
 
-    setChatMessages((prev) => [...prev, userMsg, aiMsg]);
+    try {
+      const res = await fetch(`${API_URL}/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      const aiReplyText = data.reply || `Analyzed "${text}": Options updated across nearby map & marketplace.`;
+
+      const aiMsg: ChatMessage = {
+        id: 'msg-' + (Date.now() + 1),
+        sender: 'ai',
+        text: aiReplyText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      setChatMessages((prev) => [...prev, aiMsg]);
+    } catch (e) {
+      const fallbackAiMsg: ChatMessage = {
+        id: 'msg-' + (Date.now() + 1),
+        sender: 'ai',
+        text: `🌱 Analyzed "${text}": Recommended actions:\n1. ♻️ Deposit at Eco Hub #2\n2. 🛒 Exchange items on EcoMarket\n3. 🍱 Claim food on EcoFood.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setChatMessages((prev) => [...prev, fallbackAiMsg]);
+    }
   };
 
   const reserveSurplusFood = (foodId: string) => {
@@ -392,17 +1165,49 @@ Options available:
         return item;
       })
     );
-    setProfile((prev) => ({ ...prev, ecoPoints: prev.ecoPoints + 10 }));
+
+    setProfile((prev) => {
+      const newPoints = prev.ecoPoints + 10;
+      const updated = { ...prev, ecoPoints: newPoints };
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ecoPoints: newPoints }),
+        }).catch(() => {});
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: 'Reserved Surplus Meal Box',
+      location: 'Central Canteen Complex',
+      type: 'Projects',
+      details: 'Claimed surplus meal to prevent food waste',
+      status: 'Reserved',
+      points: 10,
+      badge: '🍱 EcoFood',
+      icon: '🍱',
+    });
+
     addToast('🍱 Meal reserved on EcoFood! +10 Eco Points credited.', 'success');
   };
 
-  const listSurplusFood = (listing: Partial<SurplusFoodListing>) => {
-    const newListing: SurplusFoodListing = {
-      id: 'FOOD-' + Math.floor(2000 + Math.random() * 800),
+  const listSurplusFood = async (listing: Partial<SurplusFoodListing>) => {
+    let imageUrl = listing.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600';
+    if (listing.imageUrl) {
+      const uploadedUrl = await uploadImageToCloudinary(listing.imageUrl);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
+    const payload = {
       restaurantName: listing.restaurantName || 'Green Café',
       restaurantLogo: listing.restaurantLogo || '🥗',
       foodName: listing.foodName || 'Surplus Meal Box',
-      category: listing.category || 'Meals',
+      category: (listing.category || 'Meals') as SurplusFoodListing['category'],
       quantityLabel: listing.quantityLabel || '10 kg (20 servings)',
       originalPriceInr: listing.originalPriceInr || 150,
       discountedPriceInr: listing.discountedPriceInr || 69,
@@ -410,17 +1215,97 @@ Options available:
       pickupWindow: listing.pickupWindow || '7:00 PM – 9:00 PM',
       availableServings: listing.availableServings || 20,
       location: listing.location || 'Central Canteen Complex',
-      status: 'Available',
+      status: 'Available' as SurplusFoodListing['status'],
       bestBeforeInfo: listing.bestBeforeInfo || 'Prepared fresh today.',
-      imageUrl: listing.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
+      imageUrl,
     };
 
+    let newListing: SurplusFoodListing = {
+      id: 'FOOD-' + Math.floor(2000 + Math.random() * 800),
+      ...payload,
+    };
+
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/food`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data) {
+          newListing = { ...data, id: data._id || newListing.id };
+        }
+      } catch (e) {}
+    }
+
     setSurplusFoodListings((prev) => [newListing, ...prev]);
-    addToast(`🍱 Surplus food "${newListing.foodName}" published!`, 'success');
+    setProfile((prev) => {
+      const newPoints = prev.ecoPoints + 30;
+      const newContributions = (prev.communityContributions || 0) + 1;
+      const updated = { ...prev, ecoPoints: newPoints, communityContributions: newContributions };
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ecoPoints: newPoints, communityContributions: newContributions }),
+        }).catch(() => {});
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: newListing.foodName,
+      location: newListing.location,
+      type: 'Projects',
+      details: `Surplus meal listed (${newListing.quantityLabel})`,
+      status: 'Listed',
+      points: 30,
+      badge: '🍱 EcoFood',
+      imageUrl: newListing.imageUrl,
+      icon: '🍱',
+    });
+
+    addToast(`🍱 Surplus food "${newListing.foodName}" published! +30 Eco Points credited.`, 'success');
   };
 
-  const offerFoodToNGO = (foodId: string, ngoId: string) => {
-    setSurplusFoodListings((prev) => prev.map((f) => (f.id === foodId ? { ...f, status: 'Donated' } : f)));
+  const offerFoodToNGO = (ngoId: string, details?: { phone?: string; location?: string; remarks?: string }) => {
+    setSurplusFoodListings((prev) => prev.map((f) => ({ ...f, status: 'Donated' })));
+
+    setProfile((prev) => {
+      const newPoints = prev.ecoPoints + 25;
+      const newContributions = (prev.communityContributions || 0) + 1;
+      const updated = { ...prev, ecoPoints: newPoints, communityContributions: newContributions };
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ecoPoints: newPoints, communityContributions: newContributions }),
+        }).catch(() => {});
+      }
+      return updated;
+    });
+
+    logUserActivity({
+      title: 'NGO Food Rescue Offer',
+      location: details?.location || 'Central Canteen Complex',
+      type: 'Projects',
+      details: `Food rescue meals offered to NGO (${details?.remarks || 'Contact: ' + (details?.phone || 'Provided')})`,
+      status: 'Dispatched',
+      points: 25,
+      badge: '🤝 NGO Rescue',
+      icon: '🤝',
+    });
+
     addToast('🤝 Food rescue donation dispatched to NGO! +25 Community Points.', 'success');
   };
 
@@ -499,14 +1384,31 @@ Options available:
       qrCodePlaceholder: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${voucherCode}`,
     };
 
-    setProfile((prev) => ({
-      ...prev,
-      ecoPoints: prev.ecoPoints - pointsCost,
-    }));
+    setProfile((prev) => {
+      const newPoints = Math.max(0, prev.ecoPoints - pointsCost);
+      const updated = { ...prev, ecoPoints: newPoints };
+      if (token) {
+        fetch(`${API_URL}/auth/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ecoPoints: newPoints }),
+        }).catch(() => {});
+      }
+      return updated;
+    });
 
-    setRedeemedVouchers((prev) => [newVoucher, ...prev]);
+    setRedeemedVouchers((prev) => {
+      const updatedV = [newVoucher, ...prev];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_vouchers', JSON.stringify(updatedV));
+      }
+      return updatedV;
+    });
 
-    addToast(`🎉 Reward "${title}" redeemed! Code ${voucherCode} created.`, 'success');
+    addToast(`🎉 Reward "${title}" redeemed! Code ${voucherCode} created. View under My Vouchers!`, 'success');
     return newVoucher;
   };
 
@@ -526,7 +1428,7 @@ Options available:
     );
   };
 
-  const addPostComment = (postId: string, text: string) => {
+  const addPostComment = async (postId: string, text: string) => {
     if (!text.trim()) return;
     const newComment = {
       id: 'c-' + Date.now(),
@@ -536,46 +1438,115 @@ Options available:
       timestamp: 'Just now',
     };
 
+    if (token) {
+      try {
+        await fetch(`${API_URL}/posts/${postId}/comment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text }),
+        });
+      } catch (e) {}
+    }
+
     setSocialPosts((prev) =>
       prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, newComment] } : p))
     );
     addToast('💬 Comment posted to Community Feed!', 'success');
   };
 
-  const createSocialPost = (post: Partial<SocialPost>) => {
-    const newPost: SocialPost = {
-      id: 'POST-' + Date.now(),
+  const createSocialPost = async (post: Partial<SocialPost>) => {
+    let imageUrl = post.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=600';
+    if (post.imageUrl) {
+      const uploadedUrl = await uploadImageToCloudinary(post.imageUrl);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
+    const payload = {
       authorName: profile.name,
       authorAvatar: profile.avatar,
       authorBadge: `${profile.level} · Just now`,
       postType: post.postType || 'Contribution',
-      timestamp: 'Just now',
       locationTag: post.locationTag || 'SAGE University Campus',
       content: post.content || 'Share something done for the planet!',
-      imageUrl: post.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=600',
+      imageUrl,
       impactBadge: post.impactBadge || 'Verified Action',
       pointsEarned: 50,
+    };
+
+    let savedPost: SocialPost = {
+      id: 'POST-' + Date.now(),
+      ...payload,
+      timestamp: 'Just now',
       likesCount: 1,
       isLiked: true,
       sharesCount: 0,
       comments: [],
     };
 
-    setSocialPosts((prev) => [newPost, ...prev]);
-    setProfile((prev) => ({ ...prev, ecoPoints: prev.ecoPoints + 50 }));
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/posts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data) {
+          savedPost = { ...data, id: data._id || savedPost.id };
+        }
+      } catch (e) {}
+    }
+
+    setSocialPosts((prev) => [savedPost, ...prev]);
+    setProfile((prev) => ({
+      ...prev,
+      ecoPoints: prev.ecoPoints + 50,
+      communityContributions: (prev.communityContributions || 0) + 1,
+    }));
+
+    logUserActivity({
+      title: savedPost.postType + ' Published',
+      location: savedPost.locationTag,
+      type: 'Projects',
+      details: 'Published eco action post on social feed',
+      status: 'Published',
+      points: 50,
+      badge: '🌐 Social',
+      imageUrl: savedPost.imageUrl,
+      icon: '🌐',
+    });
+
     addToast('📢 Post published to Community Social Feed! +50 Eco Points.', 'success');
   };
 
-  const toggleFollowUser = () => {
+  const toggleFollowUser = (targetAuthorName?: string) => {
+    if (
+      targetAuthorName &&
+      (targetAuthorName.toLowerCase().includes(profile.name.toLowerCase()) ||
+        targetAuthorName.includes(profile.playerNumber))
+    ) {
+      addToast('⚠️ You cannot follow your own account!', 'warning');
+      return;
+    }
+
     setProfile((prev) => {
       const isFollowing = !prev.isFollowing;
+      const followingCount = isFollowing
+        ? (prev.followingCount || 0) + 1
+        : Math.max(0, (prev.followingCount || 0) - 1);
       return {
         ...prev,
         isFollowing,
-        followingCount: isFollowing ? prev.followingCount + 1 : prev.followingCount - 1,
+        followingCount,
       };
     });
-    addToast(profile.isFollowing ? 'Unfollowed profile.' : '✨ Following profile! Feed updated.', 'info');
+    addToast(profile.isFollowing ? 'Unfollowed user.' : '✨ Following user! Feed updated.', 'info');
   };
 
   const joinClubGroup = (clubId: string) => {
@@ -710,6 +1681,7 @@ Options available:
         listMarketItem,
         offerMaterialToIndustry,
         joinCommunityProject,
+        createCommunityProject,
         donateToProject,
         joinChallenge,
         redeemReward,
@@ -733,6 +1705,20 @@ Options available:
         rsvpEvent,
         fundCsrProject,
         joinCsrMission,
+        isAuthModalOpen,
+        openAuthModal,
+        closeAuthModal,
+        token,
+        isAuthenticated: !!token,
+        login,
+        register,
+        logout,
+        promoteToAdmin,
+        updateUserProfile,
+        uploadImageToCloudinary,
+        addEcoPoints,
+        userActivityLog,
+        logUserActivity,
       }}
     >
       {children}

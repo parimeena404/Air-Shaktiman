@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
-import { Camera, Upload, Bot, MapPin, CheckCircle2, ShieldAlert, Sparkles, ArrowRight, RefreshCw } from 'lucide-react';
+import { Camera, Upload, Bot, MapPin, CheckCircle2, ShieldAlert, Sparkles, ArrowRight, RefreshCw, Edit3 } from 'lucide-react';
 import { CampusMap } from '../map/CampusMap';
 
 export const ReportWasteView: React.FC = () => {
@@ -28,6 +28,9 @@ export const ReportWasteView: React.FC = () => {
   ];
 
   const [selectedImage, setSelectedImage] = useState(sampleImages[0].url);
+  const [hasCustomImage, setHasCustomImage] = useState(false);
+  const [title, setTitle] = useState('Plastic & Mixed Campus Waste');
+  const [remarks, setRemarks] = useState('');
   const [location, setLocation] = useState('Block B, North Gate');
 
   const handleSimulateScan = () => {
@@ -42,7 +45,7 @@ export const ReportWasteView: React.FC = () => {
 
   const handleSubmitReport = () => {
     reportWaste({
-      title: 'Plastic & Mixed Campus Waste',
+      title: title || 'Plastic & Mixed Campus Waste',
       location,
       detectedMaterials: ['PET Plastic Bottles', 'Corrugated Cardboard', 'Metal Can'],
       estimatedQuantityKg: 12.0,
@@ -51,7 +54,7 @@ export const ReportWasteView: React.FC = () => {
       imageUrl: selectedImage,
     });
     setSubmitted(true);
-    addToast('Verified Waste Report Logged! +50 XP credited', 'success');
+    addToast('Verified Waste Report Logged! Saved to Cloudinary & MongoDB Atlas', 'success');
     setTimeout(() => {
       setShowAnalysisModal(false);
       setSubmitted(false);
@@ -61,9 +64,9 @@ export const ReportWasteView: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-mono select-none animate-in fade-in duration-300">
-      {/* 🔴 1. HERO BANNER (MATCHING USER SCREENSHOT EXACTLY WITH SPIDER-MAN) */}
+      {/* 🔴 1. HERO BANNER */}
       <div className="relative overflow-hidden rounded-xl bg-[#07080E] border-2 border-[#FF007A] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl glow-pink min-h-[340px]">
-        {/* Centered Spider-Man Image (Fitted properly without aggressive cropping) */}
+        {/* Centered Spider-Man Image */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <img
             src="/images/squid-game/spiderman.png"
@@ -72,10 +75,10 @@ export const ReportWasteView: React.FC = () => {
           />
         </div>
 
-        {/* Left Dark Gradient Overlay for Left Text Readability */}
+        {/* Left Dark Gradient Overlay */}
         <div className="absolute inset-y-0 left-0 w-full md:w-3/5 bg-gradient-to-r from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
 
-        {/* Right Dark Gradient Overlay for Right Progress Card Readability */}
+        {/* Right Dark Gradient Overlay */}
         <div className="absolute inset-y-0 right-0 hidden md:block w-3/5 bg-gradient-to-l from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
 
         {/* Left Column Text & Action Buttons */}
@@ -99,88 +102,113 @@ export const ReportWasteView: React.FC = () => {
                 const uploadElem = document.getElementById('upload-dropzone');
                 uploadElem?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-6 py-3 rounded-lg bg-[#FF007A] text-white font-black text-xs flex items-center gap-2 shadow-lg glow-pink hover:bg-[#FF007A]/90 transition-all hover:scale-105"
+              className="px-5 py-3 rounded-lg bg-[#FF007A] text-white font-black text-xs tracking-wider hover:bg-[#FF007A]/90 transition-all glow-pink shadow-lg flex items-center gap-2"
             >
-              <Camera className="w-4 h-4" />
-              <span>REPORT WASTE</span>
-              <span className="bg-black/40 text-[#03E5B7] text-[10px] px-2 py-0.5 rounded font-mono font-bold">
-                +30 Pts
-              </span>
+              <span>REPORT WASTE NOW</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
 
             <button
-              onClick={() => setActiveTab('challenges')}
-              className="px-5 py-3 rounded-lg bg-[#07080E]/80 border border-[#1D2133] hover:border-[#FF007A] text-slate-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition-all"
+              onClick={() => setActiveTab('leaderboard')}
+              className="px-5 py-3 rounded-lg bg-[#07080E]/90 border border-[#03E5B7] text-[#03E5B7] font-black text-xs tracking-wider hover:bg-[#03E5B7]/20 transition-all glow-teal shadow-lg"
             >
-              <span>VIEW MISSION</span>
-              <ArrowRight className="w-4 h-4" />
+              LEADERBOARD
             </button>
           </div>
         </div>
 
-        {/* Right Column: Mission Progress & Timer inside Hero Card */}
-        <div className="relative z-10 bg-[#07080E]/90 border border-[#1D2133] p-5 rounded-xl space-y-3 w-full md:w-auto md:min-w-[260px] text-left md:text-right backdrop-blur-md">
-          <div className="space-y-1">
-            <span className="text-[10px] text-slate-400 font-bold">MISSION PROGRESS</span>
-            <div className="text-3xl font-black text-[#FF007A]">85.6%</div>
-            <div className="w-full h-2 bg-[#0D0F17] rounded-full overflow-hidden border border-[#1D2133] p-0.5">
-              <div className="h-full bg-gradient-to-r from-[#FF007A] to-[#03E5B7] rounded-full glow-pink" style={{ width: '85.6%' }} />
-            </div>
-            <div className="text-[9px] text-slate-400 font-mono pt-0.5">
-              <span className="text-[#03E5B7] font-bold">428 KG DIVERTED</span> / 500 KG TARGET
-            </div>
+        {/* Right Progress Status Card */}
+        <div className="relative z-10 bg-[#07080E]/90 border border-[#FF007A]/40 rounded-xl p-5 backdrop-blur-md space-y-3 min-w-[240px] w-full md:w-auto shadow-2xl">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400 font-bold">ROUND 1 PROGRESS</span>
+            <span className="text-[#FF007A] font-black">68.4%</span>
           </div>
 
-          <div className="border-t border-[#1D2133] pt-2 space-y-0.5">
-            <span className="text-[9px] text-slate-400 font-bold">TIMER REMAINING</span>
-            <div className="text-sm font-black text-[#FFC700]">03D : 12H : 42M</div>
-            <div className="text-[9px] text-[#03E5B7] font-bold">1,824 CONTESTANTS DEPLOYED ◯</div>
+          {/* Progress Bar */}
+          <div className="w-full h-2.5 bg-[#0D0F17] rounded-full overflow-hidden border border-[#FF007A]/30">
+            <div
+              className="h-full bg-gradient-to-r from-[#FF007A] to-[#03E5B7] rounded-full transition-all duration-500"
+              style={{ width: '68.4%' }}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
+            <div className="bg-[#0D0F17] p-2 rounded border border-[#1D2133]">
+              <span className="text-slate-400 font-bold block">TARGET</span>
+              <span className="text-white font-black text-xs">50.0 KG</span>
+            </div>
+            <div className="bg-[#0D0F17] p-2 rounded border border-[#1D2133]">
+              <span className="text-slate-400 font-bold block">COLLECTED</span>
+              <span className="text-[#03E5B7] font-black text-xs">34.2 KG</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 🟢 2. MIDDLE ROW (3 EQUAL COLUMNS - MATCHING USER SCREENSHOT) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Column 1: UPLOAD WASTE PHOTO Card */}
-        <div id="upload-dropzone" className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-5 space-y-4 flex flex-col justify-between shadow-lg">
-          <div className="flex items-center gap-2 border-b border-[#1D2133] pb-3">
-            <Camera className="w-4 h-4 text-[#FF007A]" />
-            <h3 className="text-xs font-black text-white tracking-wider uppercase">
-              UPLOAD WASTE PHOTO
+      {/* 🟢 2. THREE MAIN CARDS (MATCHING USER SCREENSHOT EXACTLY) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="upload-dropzone">
+        {/* Column 1: AI PHOTO UPLOAD & RECYCLING DISCOVERY Card */}
+        <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-5 space-y-4 flex flex-col justify-between shadow-lg">
+          <div className="flex items-center justify-between border-b border-[#1D2133] pb-3">
+            <h3 className="text-xs font-black text-white flex items-center gap-1.5 tracking-wider">
+              <Camera className="w-4 h-4 text-[#FF007A]" />
+              AI PHOTO UPLOAD & RECYCLING DISCOVERY
             </h3>
           </div>
 
-          {/* Dotted Upload Dropzone Box */}
-          <div className="relative group cursor-pointer">
-            <div className="relative w-full h-36 rounded-lg border-2 border-dashed border-[#1D2133] bg-[#07080E] flex flex-col items-center justify-center p-4 overflow-hidden group-hover:border-[#FF007A] transition-colors">
+          {/* Upload Dropzone Box */}
+          <label className="relative group cursor-pointer block">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    if (event.target?.result) {
+                      setSelectedImage(event.target.result as string);
+                      setHasCustomImage(true);
+                      setScanned(false);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            <div className="relative w-full h-44 rounded-lg border-2 border-dashed border-[#1D2133] bg-[#07080E] flex flex-col items-center justify-center p-2 overflow-hidden group-hover:border-[#FF007A] transition-colors shadow-inner">
               <img
                 src={selectedImage}
                 alt="Selected waste photo"
-                className="absolute inset-0 w-full h-full object-cover opacity-50"
+                className={`absolute inset-0 w-full h-full object-cover transition-all ${
+                  hasCustomImage ? 'opacity-100' : 'opacity-75'
+                }`}
               />
 
               {isScanning && (
-                <div className="absolute inset-0 bg-[#FF007A]/20 scanline-overlay z-20 flex items-center justify-center">
+                <div className="absolute inset-0 bg-[#FF007A]/30 scanline-overlay z-20 flex items-center justify-center">
                   <div className="w-full h-1 bg-[#FF007A] shadow-lg shadow-[#FF007A] animate-bounce" />
-                  <div className="absolute font-mono text-[11px] font-bold text-[#FF007A] bg-[#07080E]/90 px-3 py-1 rounded border border-[#FF007A] glow-pink">
+                  <div className="absolute font-mono text-[11px] font-bold text-[#FF007A] bg-[#07080E]/95 px-3 py-1 rounded border border-[#FF007A] glow-pink">
                     🔍 AI Neural Vision Scanning...
                   </div>
                 </div>
               )}
 
               {!isScanning && (
-                <div className="relative z-10 text-center space-y-1 bg-[#07080E]/85 p-3 rounded backdrop-blur-md border border-[#1D2133]">
-                  <Camera className="w-6 h-6 text-[#FF007A] mx-auto" />
-                  <div className="text-[11px] font-bold text-white">Drag & drop photo or click to upload</div>
-                  <div className="text-[9px] text-slate-400 font-mono">JPG, PNG up to 10MB</div>
+                <div className="relative z-10 mt-auto mb-2 text-center bg-[#07080E]/90 px-3.5 py-1.5 rounded-lg backdrop-blur-md border border-[#FF007A]/50 flex items-center gap-2 glow-pink shadow-md">
+                  <Camera className="w-4 h-4 text-[#FF007A]" />
+                  <span className="text-xs font-bold text-white">
+                    {hasCustomImage ? '📷 Custom Photo Uploaded — Click to Change' : 'Click to Upload Photo'}
+                  </span>
                 </div>
               )}
             </div>
-          </div>
+          </label>
 
           {/* Sample Preset Selector */}
           <div className="space-y-1.5">
-            <span className="text-[10px] text-slate-400 font-bold">SAMPLE GARBAGE PHOTOS</span>
+            <span className="text-[10px] text-slate-400 font-bold">OR PICK SAMPLE GARBAGE PHOTO</span>
             <div className="grid grid-cols-3 gap-2">
               {sampleImages.map((img, idx) => (
                 <button
@@ -188,10 +216,11 @@ export const ReportWasteView: React.FC = () => {
                   type="button"
                   onClick={() => {
                     setSelectedImage(img.url);
+                    setHasCustomImage(false);
                     setScanned(false);
                   }}
                   className={`relative rounded overflow-hidden border-2 h-14 transition-all ${
-                    selectedImage === img.url
+                    selectedImage === img.url && !hasCustomImage
                       ? 'border-[#FF007A] ring-2 ring-[#FF007A]/40'
                       : 'border-[#1D2133] opacity-60 hover:opacity-100'
                   }`}
@@ -203,6 +232,20 @@ export const ReportWasteView: React.FC = () => {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Report Title / Description Input */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-[#FF007A]" /> REPORT TITLE / WASTE TYPE
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Overflowing PET Bottles & Plastic Waste"
+              className="w-full bg-[#07080E] border border-[#1D2133] rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#FF007A] font-mono"
+            />
           </div>
 
           {/* Location Picker */}
@@ -220,6 +263,20 @@ export const ReportWasteView: React.FC = () => {
               <option value="Hostel Block A, Backyard">Hostel Block A</option>
               <option value="Main Canteen Loading Bay">Main Canteen</option>
             </select>
+          </div>
+
+          {/* Remarks Input */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
+              <Edit3 className="w-3 h-3 text-[#03E5B7]" /> REMARKS / ADDITIONAL NOTES
+            </label>
+            <textarea
+              rows={2}
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="Add optional notes (e.g. Near Canteen exit, blocking drainage)..."
+              className="w-full bg-[#07080E] border border-[#1D2133] rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#03E5B7] font-mono resize-none"
+            />
           </div>
 
           {/* Bright Green Analyze Button */}
@@ -265,10 +322,10 @@ export const ReportWasteView: React.FC = () => {
             </div>
             <div>
               <span className="text-[9px] text-slate-400 font-bold uppercase">WASTE DETECTED</span>
-              <h4 className="text-sm font-black text-white tracking-wide">Plastic & Cardboard</h4>
+              <h4 className="text-sm font-black text-white tracking-wide">{title || 'Plastic & Cardboard'}</h4>
               <div className="text-[10px] text-[#03E5B7] font-bold flex items-center gap-1 pt-0.5">
                 <MapPin className="w-3 h-3 text-[#FF007A]" />
-                <span>Block B, North Gate</span>
+                <span>{location}</span>
               </div>
             </div>
           </div>
@@ -318,12 +375,23 @@ export const ReportWasteView: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => setShowAnalysisModal(true)}
-            className="w-full py-2.5 rounded-lg bg-[#07080E] border border-[#03E5B7] text-[#03E5B7] hover:bg-[#03E5B7]/20 text-xs font-black tracking-wider transition-all"
-          >
-            VIEW FULL ANALYSIS
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={handleSubmitReport}
+              disabled={submitted}
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-[#FF007A] to-[#03E5B7] text-[#07080E] font-black text-xs tracking-wider transition-all hover:brightness-110 shadow-lg flex items-center justify-center gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{submitted ? 'REPORT LOGGED & SAVED ✓' : 'SUBMIT & LOG REPORT (+10 PTS)'}</span>
+            </button>
+
+            <button
+              onClick={() => setShowAnalysisModal(true)}
+              className="w-full py-2 rounded-lg bg-[#07080E] border border-slate-700 text-slate-300 hover:text-[#03E5B7] hover:border-[#03E5B7] text-[11px] font-bold tracking-wider transition-all"
+            >
+              VIEW FULL AI ANALYSIS
+            </button>
+          </div>
         </div>
 
         {/* Column 3: INDORE CAMPUS LIVE GRID TELEMETRY MAP Card */}
@@ -370,7 +438,7 @@ export const ReportWasteView: React.FC = () => {
         </div>
       </div>
 
-      {/* 🟡 3. BOTTOM ROW (4 METRIC CARDS - MATCHING USER SCREENSHOT) */}
+      {/* 🟡 3. BOTTOM ROW (4 METRIC CARDS) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: YOUR IMPACT SCORE */}
         <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-4 flex items-center gap-4 shadow-lg">
@@ -379,36 +447,36 @@ export const ReportWasteView: React.FC = () => {
               <circle cx="50" cy="50" r="40" stroke="#1D2133" strokeWidth="8" fill="transparent" />
               <circle cx="50" cy="50" r="40" stroke="#03E5B7" strokeWidth="8" strokeDasharray="251" strokeDashoffset="50" strokeLinecap="round" fill="transparent" />
             </svg>
-            <span className="absolute font-black text-xs text-white">7,840</span>
+            <span className="absolute font-black text-xs text-white">{profile.sustainabilityScore}</span>
           </div>
           <div>
-            <span className="text-[10px] font-black text-[#FF007A] tracking-wider uppercase">YOUR IMPACT SCORE</span>
-            <div className="text-sm font-black text-[#03E5B7]">ECO POINTS</div>
-            <span className="text-[10px] text-slate-400">Top 27% of Contestants</span>
+            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">YOUR IMPACT SCORE</span>
+            <div className="text-base font-black text-[#03E5B7]">{profile.sustainabilityScore} XP</div>
+            <span className="text-[10px] text-slate-400">Total verified actions</span>
           </div>
         </div>
 
-        {/* Card 2: SURVIVAL STREAK */}
-        <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-4 flex items-center gap-4 shadow-lg">
-          <div className="w-12 h-12 rounded-full bg-[#FF007A]/15 border border-[#FF007A] flex items-center justify-center text-[#FF007A] text-xl flex-shrink-0 glow-pink">
-            🔥
-          </div>
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">SURVIVAL STREAK</span>
-            <div className="text-base font-black text-white">12 DAYS</div>
-            <span className="text-[10px] text-slate-400">Keep it up, Survivor!</span>
-          </div>
-        </div>
-
-        {/* Card 3: RANK */}
+        {/* Card 2: RECOVERED WASTE */}
         <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-4 flex items-center gap-4 shadow-lg">
           <div className="w-12 h-12 rounded-full bg-[#03E5B7]/15 border border-[#03E5B7] flex items-center justify-center text-[#03E5B7] text-xl flex-shrink-0 glow-teal">
-            👑
+            ♻️
           </div>
           <div>
-            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">RANK</span>
-            <div className="text-base font-black text-[#03E5B7]">#27</div>
-            <span className="text-[10px] text-slate-400">of 456 Contestants</span>
+            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">RECOVERED WASTE</span>
+            <div className="text-base font-black text-white">{profile.wasteRecoveredKg} kg</div>
+            <span className="text-[10px] text-slate-400">Diverted from landfill</span>
+          </div>
+        </div>
+
+        {/* Card 3: CO₂ SAVED */}
+        <div className="bg-[#0D0F17] border border-[#1D2133] rounded-xl p-4 flex items-center gap-4 shadow-lg">
+          <div className="w-12 h-12 rounded-full bg-[#FF007A]/15 border border-[#FF007A] flex items-center justify-center text-[#FF007A] text-xl flex-shrink-0 glow-pink">
+            🌱
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">CO₂ AVOIDED</span>
+            <div className="text-base font-black text-[#03E5B7]">{profile.co2SavedKg} kg</div>
+            <span className="text-[10px] text-slate-400">Emissions prevented</span>
           </div>
         </div>
 
@@ -419,7 +487,7 @@ export const ReportWasteView: React.FC = () => {
           </div>
           <div>
             <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">ECO CASH POOL</span>
-            <div className="text-base font-black text-[#FFC700]">₹2,840 Pts</div>
+            <div className="text-base font-black text-[#FFC700]">₹{profile.ecoPoints} Pts</div>
             <span className="text-[10px] text-slate-400">Total rewards this round</span>
           </div>
         </div>
@@ -500,12 +568,6 @@ export const ReportWasteView: React.FC = () => {
               >
                 DISPATCH CLEANUP SQUAD (+50 XP)
               </button>
-              <button
-                onClick={() => setShowAnalysisModal(false)}
-                className="px-5 py-3 rounded bg-[#07080E] border border-[#1D2133] text-white text-xs font-bold hover:bg-[#1D2133]"
-              >
-                CLOSE
-              </button>
             </div>
           </div>
         </div>
@@ -513,4 +575,3 @@ export const ReportWasteView: React.FC = () => {
     </div>
   );
 };
-

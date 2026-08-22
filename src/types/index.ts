@@ -59,6 +59,7 @@ export type MainTab =
 export interface UserProfile {
   name: string;
   playerNumber: string;
+  role?: UserRole;
   sustainabilityScore: number;
   scoreChangeMonth: number;
   co2SavedKg: number;
@@ -98,6 +99,8 @@ export interface MarketItem {
   category: 'E-Waste' | 'Plastic' | 'Metal' | 'Paper' | 'Electronics' | 'Furniture' | 'Reusable Items';
   quantity: string;
   priceInr: number;
+  pointsCost?: number;
+  description?: string;
   location: string;
   sellerName: string;
   sellerAvatar: string;
@@ -113,6 +116,7 @@ export interface IndustryDemand {
   logo: string;
   materialNeeded: string;
   requiredQuantity: string;
+  remainingQuantityKg: number;
   offerPricePerKgInr: number;
   location: string;
   pickupAvailable: boolean;
@@ -469,5 +473,19 @@ export interface CsrReport {
   impactScore: number;
   statusPercentage: number;
   generatedDate: string;
+}
+
+export interface UserActivityLogItem {
+  id: string;
+  title: string;
+  location: string;
+  type: 'Waste Reports' | 'Recycling' | 'Cleanup' | 'Projects' | 'Challenges';
+  details: string;
+  status: string;
+  points: number;
+  timestamp: string;
+  badge: string;
+  imageUrl?: string;
+  icon: string;
 }
 

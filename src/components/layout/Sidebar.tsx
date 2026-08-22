@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useEco } from '../../context/EcoContext';
 import { MainTab } from '../../types';
 import {
@@ -55,7 +55,7 @@ interface NavSection {
 }
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, profile, role, setRole, isMobileMenuOpen, closeMobileMenu } = useEco();
+  const { activeTab, setActiveTab, profile, role, setRole, isMobileMenuOpen, closeMobileMenu, isAuthenticated, openAuthModal, logout } = useEco();
 
   const csrSection: NavSection = {
     title: 'CORPORATE IMPACT',
@@ -81,7 +81,6 @@ export const Sidebar: React.FC = () => {
         { id: 'eco-ai', label: 'Eco AI Handler', icon: Bot, badge: 'Copilot' },
       ],
     },
-    csrSection,
     {
       title: 'DISCOVER & NEARBY MAP',
       items: [
@@ -133,9 +132,9 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: 'CAMPUS INTELLIGENCE',
+      title: 'CITY INTELLIGENCE',
       items: [
-        { id: 'campus-monitor', label: 'Campus Monitor', icon: Activity },
+        { id: 'campus-monitor', label: 'City Monitor', icon: Activity },
         { id: 'energy', label: 'Energy Grid', icon: Zap },
         { id: 'water', label: 'Water Monitor', icon: Droplet },
         { id: 'waste-analytics', label: 'Waste Analytics', icon: Trash2 },
@@ -217,9 +216,9 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: 'CAMPUS INTELLIGENCE',
+      title: 'CITY INTELLIGENCE',
       items: [
-        { id: 'campus-monitor', label: 'Grid Monitor', icon: Activity },
+        { id: 'campus-monitor', label: 'City Monitor', icon: Activity },
         { id: 'energy', label: 'Energy Grid', icon: Zap },
         { id: 'water', label: 'Water Grid', icon: Droplet },
         { id: 'waste-analytics', label: 'Waste Analytics', icon: Trash2 },
@@ -238,12 +237,38 @@ export const Sidebar: React.FC = () => {
       ? adminSections
       : studentSections;
 
+  const desktopNavRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+
+  React.useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedScroll = sessionStorage.getItem('sidebar_scroll_top');
+    if (savedScroll) {
+      const top = parseInt(savedScroll, 10);
+      if (desktopNavRef.current) desktopNavRef.current.scrollTop = top;
+      if (mobileNavRef.current) mobileNavRef.current.scrollTop = top;
+    }
+  }, [activeTab, role]);
+
   const handleItemClick = (id: MainTab) => {
+    if (desktopNavRef.current) {
+      sessionStorage.setItem('sidebar_scroll_top', desktopNavRef.current.scrollTop.toString());
+    }
+    if (mobileNavRef.current) {
+      sessionStorage.setItem('sidebar_scroll_top', mobileNavRef.current.scrollTop.toString());
+    }
+
     setActiveTab(id);
     closeMobileMenu();
   };
 
   const handleRoleChange = (newRole: 'student' | 'corporate' | 'admin') => {
+    if (newRole === 'admin' && profile.role !== 'admin') {
+      return;
+    }
+    if (newRole === 'corporate' && profile.role !== 'corporate' && profile.role !== 'admin') {
+      return;
+    }
     setRole(newRole);
     if (newRole === 'corporate') {
       setActiveTab('csr-hub');
@@ -300,33 +325,45 @@ export const Sidebar: React.FC = () => {
           >
             #456 PLAYER
           </button>
-          <button
-            onClick={() => handleRoleChange('corporate')}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
-              role === 'corporate'
-                ? 'bg-[#FFC700] text-[#07080E] shadow-sm glow-gold'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Briefcase className="w-2.5 h-2.5" />
-            CSR
-          </button>
-          <button
-            onClick={() => handleRoleChange('admin')}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
-              role === 'admin'
-                ? 'bg-[#FF007A] text-white shadow-sm glow-pink'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Shield className="w-2.5 h-2.5" />
-            FRONT MAN
-          </button>
+          {(profile.role === 'corporate' || profile.role === 'admin') && (
+            <button
+              onClick={() => handleRoleChange('corporate')}
+              className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
+                role === 'corporate'
+                  ? 'bg-[#FFC700] text-[#07080E] shadow-sm glow-gold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Briefcase className="w-2.5 h-2.5" />
+              CSR
+            </button>
+          )}
+          {profile.role === 'admin' && (
+            <button
+              onClick={() => handleRoleChange('admin')}
+              className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
+                role === 'admin'
+                  ? 'bg-[#FF007A] text-white shadow-sm glow-pink'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Shield className="w-2.5 h-2.5" />
+              FRONT MAN
+            </button>
+          )}
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar">
+      <div
+        ref={isMobile ? mobileNavRef : desktopNavRef}
+        onScroll={(e) => {
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('sidebar_scroll_top', e.currentTarget.scrollTop.toString());
+          }
+        }}
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar"
+      >
         {currentSections.map((sec) => (
           <div key={sec.title}>
             <div className="px-2 mb-1.5 text-[9px] font-bold text-[#FF007A] tracking-widest uppercase flex items-center justify-between font-sans">
@@ -383,21 +420,34 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Footer Player Info Card */}
       <div className="p-2.5 border-t border-[#1D2133] bg-[#0D0F17]">
         <div
-          onClick={() => handleItemClick('community-profile')}
+          onClick={() => {
+            if (!isAuthenticated) {
+              openAuthModal();
+              closeMobileMenu();
+            } else {
+              handleItemClick('community-profile');
+            }
+          }}
           className="p-2 rounded bg-[#07080E] border border-[#FF007A]/40 hover:border-[#FF007A] cursor-pointer transition-all flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-[#FF007A]/20 border border-[#FF007A] flex items-center justify-center text-[#FF007A] font-black text-xs">
-              #456
+              {profile.playerNumber || '#456'}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-white">Dheeraj Sharma</span>
-                <span className="text-[8px] px-1 py-0.2 rounded bg-[#03E5B7]/20 text-[#03E5B7] border border-[#03E5B7]/40 font-bold">
-                  ◯ ACTIVE
+                <span className="text-xs font-bold text-white truncate max-w-[100px]">{profile.name}</span>
+                <span className={`text-[8px] px-1 py-0.2 rounded font-bold border ${
+                  isAuthenticated
+                    ? 'bg-[#03E5B7]/20 text-[#03E5B7] border-[#03E5B7]/40'
+                    : 'bg-[#FF007A]/20 text-[#FF007A] border-[#FF007A]/40'
+                }`}>
+                  {isAuthenticated ? '◯ VERIFIED' : 'GUEST'}
                 </span>
               </div>
-              <p className="text-[9px] text-[#FF007A] font-bold">CONTESTANT · CG-4B291</p>
+              <p className="text-[9px] text-[#FF007A] font-bold">
+                {isAuthenticated ? 'CONTESTANT · ACTIVE' : 'TAP TO AUTHENTICATE'}
+              </p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4 text-[#FF007A]" />

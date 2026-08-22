@@ -4,6 +4,7 @@ import React from 'react';
 import { useEco } from '../context/EcoContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Header } from '../components/layout/Header';
+import { AuthModal } from '../components/auth/AuthModal';
 
 import { OverviewView } from '../components/views/OverviewView';
 import { ReportWasteView } from '../components/views/ReportWasteView';
@@ -57,9 +58,14 @@ import { CsrFundingView } from '../components/views/csr/CsrFundingView';
 import { CsrImpactDashboardView } from '../components/views/csr/CsrImpactDashboardView';
 import { CsrLeaderboardView } from '../components/views/csr/CsrLeaderboardView';
 import { CsrReportsView } from '../components/views/csr/CsrReportsView';
+import { AuthGateView } from '../components/auth/AuthGateView';
 
 export default function Home() {
-  const { activeTab, role } = useEco();
+  const { activeTab, role, isAuthenticated, token } = useEco();
+
+  if (!isAuthenticated && !token) {
+    return <AuthGateView />;
+  }
 
   const renderActiveView = () => {
     // If role is set to Corporate Sponsor and overview is selected, show CSR Hub
@@ -197,6 +203,9 @@ export default function Home() {
 
       {/* Shinchan in Squid Game Outfit Garbage Collector Mascot */}
       <ShinchanCollector />
+
+      {/* Auth Protocol Modal */}
+      <AuthModal />
     </div>
   );
 }

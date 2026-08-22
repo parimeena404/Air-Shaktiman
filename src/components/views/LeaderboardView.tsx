@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
-import { Award, Trophy, Users, Shield, Flame, Crown } from 'lucide-react';
+import { Award, Trophy, Crown } from 'lucide-react';
 
 export const LeaderboardView: React.FC = () => {
-  const { leaderboard } = useEco();
+  const { leaderboard, profile } = useEco();
   const [activeCategory, setActiveCategory] = useState<'Students' | 'Teams' | 'Departments' | 'Hostels'>('Students');
 
   const firstPlace = leaderboard[0];
@@ -101,7 +101,8 @@ export const LeaderboardView: React.FC = () => {
 
         <div className="divide-y divide-[#1D2133]">
           {leaderboard.map((user) => {
-            const isMe = user.playerNumber === '#456' || user.name.includes('Dheeraj');
+            const isMe = (profile.playerNumber && user.playerNumber === profile.playerNumber) || (profile.name && user.name.toLowerCase().includes(profile.name.toLowerCase()));
+            const displayName = isMe ? `${profile.name} (You)` : user.name;
             return (
               <div
                 key={user.rank}
@@ -122,7 +123,7 @@ export const LeaderboardView: React.FC = () => {
                   <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover border border-[#1D2133]" />
                   <div>
                     <div className="font-bold text-white flex items-center gap-2">
-                      <span>{user.name}</span>
+                      <span>{displayName}</span>
                       <span className="text-[10px] font-mono text-[#FF007A] font-black">{user.playerNumber}</span>
                       {user.badge && (
                         <span className="text-[9px] px-2 py-0.5 rounded bg-[#03E5B7]/20 text-[#03E5B7] border border-[#03E5B7]/30 font-mono font-bold">
@@ -148,4 +149,3 @@ export const LeaderboardView: React.FC = () => {
     </div>
   );
 };
-

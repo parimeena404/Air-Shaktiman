@@ -14,11 +14,14 @@ import {
   CheckCircle2,
   Clock,
   Radio,
+  LogIn,
+  LogOut,
+  UserCheck,
 } from 'lucide-react';
 import { MainTab } from '../../types';
 
 export const Header: React.FC = () => {
-  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu } = useEco();
+  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu, isAuthenticated, openAuthModal, logout } = useEco();
   const [showNotifications, setShowNotifications] = useState(false);
   const [timeString, setTimeString] = useState('');
 
@@ -83,7 +86,7 @@ export const Header: React.FC = () => {
       case 'rewards':
         return 'REWARDS VAULT';
       case 'campus-monitor':
-        return 'CAMPUS MONITOR';
+        return 'CITY MONITOR';
       case 'energy':
         return 'ENERGY ANALYTICS';
       case 'water':
@@ -167,13 +170,13 @@ export const Header: React.FC = () => {
       <div className="hidden lg:flex items-center gap-4 bg-[#0D0F17] border border-[#FF007A]/40 px-4 py-1.5 rounded-lg shadow-md">
         {/* Initial Badge Box */}
         <div className="w-8 h-8 rounded bg-[#FF007A]/20 border border-[#FF007A] flex items-center justify-center text-[#FF007A] font-black text-xs">
-          #456
+          {profile.playerNumber || '#456'}
         </div>
 
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-400 text-[10px]">CONTESTANT // #456</span>
-            <span className="text-white font-bold text-xs tracking-wide">DHEERAJ</span>
+            <span className="text-slate-400 text-[10px]">CONTESTANT // {profile.playerNumber || '#456'}</span>
+            <span className="text-white font-bold text-xs tracking-wide uppercase">{profile.name}</span>
             <span className="text-[10px] px-1.5 py-0.2 bg-[#03E5B7]/20 border border-[#03E5B7]/40 text-[#03E5B7] rounded font-bold">
               LVL 12
             </span>
@@ -275,6 +278,26 @@ export const Header: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Authentication Button */}
+        {isAuthenticated ? (
+          <button
+            onClick={logout}
+            className="px-2.5 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/50 text-[#FF007A] font-bold text-xs hover:bg-[#FF007A]/30 transition-all flex items-center gap-1.5 font-mono"
+            title="Logout of EcoVerse"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">LOGOUT</span>
+          </button>
+        ) : (
+          <button
+            onClick={openAuthModal}
+            className="px-3 py-1 rounded bg-gradient-to-r from-[#FF007A] to-[#03E5B7] text-[#07080E] font-black text-xs hover:brightness-110 transition-all shadow-[0_0_15px_rgba(3,229,183,0.3)] flex items-center gap-1.5 font-mono"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>JOIN ARENA</span>
+          </button>
+        )}
       </div>
     </header>
   );
