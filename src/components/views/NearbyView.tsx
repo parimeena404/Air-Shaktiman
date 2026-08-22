@@ -207,7 +207,7 @@ export const NearbyView: React.FC = () => {
           </div>
 
           {/* Controls: Rewards Toggle & Distance Radius */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* Rewards-Only Toggle */}
             <label className="flex items-center gap-2 cursor-pointer text-xs font-mono text-slate-300">
               <input
@@ -222,7 +222,7 @@ export const NearbyView: React.FC = () => {
             </label>
 
             {/* Radius Selector */}
-            <div className="flex items-center gap-1 text-xs font-mono bg-slate-900 border border-slate-800 rounded-xl p-1">
+            <div className="flex items-center gap-1 text-xs font-mono bg-slate-900 border border-slate-800 rounded-xl p-1 overflow-x-auto">
               <span className="text-slate-400 px-2">Radius:</span>
               {[500, 1000, 2000, 5000].map((r) => (
                 <button
@@ -243,19 +243,19 @@ export const NearbyView: React.FC = () => {
       {/* MAP & SIDE DETAILS DUAL LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* INTERACTIVE LEAFLET REAL MAP CONTAINER (2 Cols) */}
-        <div className="lg:col-span-2 relative bg-[#07080E] border-2 border-slate-800 rounded-3xl h-[480px] overflow-hidden shadow-2xl">
+        <div className="lg:col-span-2 relative bg-[#07080E] border-2 border-slate-800 rounded-3xl h-[340px] sm:h-[420px] md:h-[480px] overflow-hidden shadow-2xl">
           {/* Leaflet Dynamic Map Container Div */}
           <div ref={mapRef} className="w-full h-full z-0" />
 
           {/* Map Attribution Overlay Badge */}
-          <div className="absolute top-3 left-3 z-10 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-[10px] font-mono text-[#03E5B7] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5 pointer-events-none">
-            <Compass className="w-3.5 h-3.5 text-[#03E5B7] animate-spin" />
-            <span>REAL DYNAMIC LEAFLET MAP • MARKERS LOCKED TO GPS COORDINATES</span>
+          <div className="absolute top-3 left-3 right-3 sm:right-auto z-10 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-[10px] font-mono text-[#03E5B7] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5 pointer-events-none truncate">
+            <Compass className="w-3.5 h-3.5 text-[#03E5B7] animate-spin flex-shrink-0" />
+            <span className="truncate">REAL DYNAMIC LEAFLET MAP • GPS MARKERS LOCKED</span>
           </div>
 
           {/* COMPACT MAP POPUP CARD (Active Selected Marker) */}
           {activePartner && (
-            <div className="absolute bottom-4 left-4 right-4 z-20 bg-[#0D0F17]/95 border border-slate-700 rounded-2xl p-4 shadow-2xl backdrop-blur-md flex items-center justify-between animate-in slide-in-from-bottom-4">
+            <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 z-20 bg-[#0D0F17]/95 border border-slate-700 rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in slide-in-from-bottom-4">
               <div className="flex items-center gap-3">
                 <img
                   src={activePartner.imageUrl}

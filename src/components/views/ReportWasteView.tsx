@@ -73,10 +73,10 @@ export const ReportWasteView: React.FC = () => {
         </div>
 
         {/* Left Dark Gradient Overlay for Left Text Readability */}
-        <div className="absolute inset-y-0 left-0 w-3/5 bg-gradient-to-r from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
+        <div className="absolute inset-y-0 left-0 w-full md:w-3/5 bg-gradient-to-r from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
 
         {/* Right Dark Gradient Overlay for Right Progress Card Readability */}
-        <div className="absolute inset-y-0 right-0 w-3/5 bg-gradient-to-l from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
+        <div className="absolute inset-y-0 right-0 hidden md:block w-3/5 bg-gradient-to-l from-[#07080E] via-[#07080E]/85 to-transparent pointer-events-none z-0" />
 
         {/* Left Column Text & Action Buttons */}
         <div className="relative z-10 space-y-4 max-w-xl">
@@ -119,7 +119,7 @@ export const ReportWasteView: React.FC = () => {
         </div>
 
         {/* Right Column: Mission Progress & Timer inside Hero Card */}
-        <div className="relative z-10 bg-[#07080E]/90 border border-[#1D2133] p-5 rounded-xl space-y-3 min-w-[260px] text-right backdrop-blur-md">
+        <div className="relative z-10 bg-[#07080E]/90 border border-[#1D2133] p-5 rounded-xl space-y-3 w-full md:w-auto md:min-w-[260px] text-left md:text-right backdrop-blur-md">
           <div className="space-y-1">
             <span className="text-[10px] text-slate-400 font-bold">MISSION PROGRESS</span>
             <div className="text-3xl font-black text-[#FF007A]">85.6%</div>
@@ -428,7 +428,7 @@ export const ReportWasteView: React.FC = () => {
       {/* 🤖 AI NEURAL VISION ANALYSIS DETAILS MODAL */}
       {showAnalysisModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 font-mono">
-          <div className="bg-[#0D0F17] border-2 border-[#03E5B7] rounded-xl max-w-xl w-full p-6 space-y-5 animate-in zoom-in-95 glow-teal relative">
+          <div className="bg-[#0D0F17] border-2 border-[#03E5B7] rounded-xl max-w-xl w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95 glow-teal relative">
             <button
               onClick={() => setShowAnalysisModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold"
@@ -449,7 +449,7 @@ export const ReportWasteView: React.FC = () => {
             </div>
 
             {/* Analysis Metrics Grid */}
-            <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3.5 rounded bg-[#07080E] border border-[#1D2133] space-y-1.5">
                 <span className="text-slate-400 text-[10px] font-bold">DETECTED MATERIALS</span>
                 <div className="flex flex-wrap gap-1.5 pt-1">

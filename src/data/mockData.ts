@@ -22,6 +22,10 @@ import {
   SocialPost,
   EcoClubGroup,
   EcoEvent,
+  CsrCompany,
+  CsrMission,
+  CsrProject,
+  CsrReport,
 } from '../types';
 
 export const initialUserProfile: UserProfile = {

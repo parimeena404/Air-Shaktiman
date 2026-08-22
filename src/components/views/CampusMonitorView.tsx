@@ -150,7 +150,7 @@ export const CampusMonitorView: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label={({ name, percentage }) => `${name} ${percentage}%`}
+                  label={({ name, percentage }: any) => `${name} ${percentage}%`}
                 >
                   {telemetry.waste.composition.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />

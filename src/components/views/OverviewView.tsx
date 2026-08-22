@@ -52,9 +52,9 @@ export const OverviewView: React.FC = () => {
           className="absolute inset-0 opacity-20 pointer-events-none bg-cover bg-center"
           style={{ backgroundImage: "url('/images/squid-game/media_1787398142284.jpg')" }}
         />
-        <div className="relative z-10 flex items-center justify-between">
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="text-[10px] text-[#03E5B7] flex items-center gap-2 font-bold">
-            <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping" />
+            <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping flex-shrink-0" />
             <span>◯ SQUID ECO-ARENA // CONTESTANT #456 CONTROL</span>
           </div>
           <button
@@ -76,7 +76,7 @@ export const OverviewView: React.FC = () => {
         </div>
 
         {/* Sub-module Tag Bar */}
-        <div className="relative z-10 pt-2 border-t border-[#1D2133] flex items-center justify-between text-[10px]">
+        <div className="relative z-10 pt-2 border-t border-[#1D2133] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[10px]">
           <span className="text-[#FF007A] flex items-center gap-1.5 font-bold">
             <span className="text-sm">◯ △ □</span>
             ROUND 7 // LIVE CAMPUS RECYCLING PROTOCOL

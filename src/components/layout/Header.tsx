@@ -18,8 +18,7 @@ import {
 import { MainTab } from '../../types';
 
 export const Header: React.FC = () => {
-  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast } = useEco();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu } = useEco();
   const [showNotifications, setShowNotifications] = useState(false);
   const [timeString, setTimeString] = useState('');
 
@@ -121,9 +120,9 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#050B08]/95 backdrop-blur-md border-b border-[#12281D] px-4 md:px-6 py-2.5 flex items-center justify-between font-mono select-none">
+    <header className="sticky top-0 z-30 bg-[#050B08]/95 backdrop-blur-md border-b border-[#12281D] px-3 sm:px-4 md:px-6 py-2.5 flex items-center justify-between font-mono select-none">
       {/* Toast Notification Container */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2 max-w-none sm:max-w-sm w-auto pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -147,19 +146,20 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Left: Mobile Toggle & Live Event Indicator */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-[#FF007A] hover:text-white"
+          onClick={toggleMobileMenu}
+          className="md:hidden text-[#FF007A] hover:text-white p-1 rounded hover:bg-[#0D0F17] transition-all"
+          aria-label="Toggle Navigation Menu"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
 
         {/* Live Event Ticker Badge */}
-        <div className="flex items-center gap-2 bg-[#0D0F17] border border-[#FF007A]/50 px-3 py-1 rounded text-xs">
-          <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping" />
-          <span className="text-[#FF007A] font-black tracking-wider">◯ SQUID ARENA LIVE</span>
-          <span className="text-slate-400 hidden sm:inline text-[10px]">ZERO WASTE CAMPUS RAID</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#0D0F17] border border-[#FF007A]/50 px-2 sm:px-3 py-1 rounded text-xs">
+          <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping flex-shrink-0" />
+          <span className="text-[#FF007A] font-black tracking-wider text-[11px] sm:text-xs">◯ SQUID ARENA</span>
+          <span className="text-slate-400 hidden sm:inline text-[10px]">ZERO WASTE RAID</span>
         </div>
       </div>
 

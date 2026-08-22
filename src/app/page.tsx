@@ -190,7 +190,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
         <Header />
 
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto pb-28 md:pb-24">
+        <main className="flex-1 p-3 sm:p-5 md:p-8 max-w-7xl w-full mx-auto pb-20 md:pb-8">
           {renderActiveView()}
         </main>
       </div>

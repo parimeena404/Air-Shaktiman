@@ -39,6 +39,7 @@ import {
   Coins,
   FileText,
   Sprout,
+  X,
 } from 'lucide-react';
 
 interface NavItem {
@@ -54,7 +55,7 @@ interface NavSection {
 }
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, profile, role, setRole } = useEco();
+  const { activeTab, setActiveTab, profile, role, setRole, isMobileMenuOpen, closeMobileMenu } = useEco();
 
   const csrSection: NavSection = {
     title: 'CORPORATE IMPACT',
@@ -237,8 +238,21 @@ export const Sidebar: React.FC = () => {
       ? adminSections
       : studentSections;
 
-  return (
-    <aside className="hidden md:flex flex-col w-64 bg-[#07080E] border-r border-[#1D2133] h-screen sticky top-0 z-40 select-none font-sans">
+  const handleItemClick = (id: MainTab) => {
+    setActiveTab(id);
+    closeMobileMenu();
+  };
+
+  const handleRoleChange = (newRole: 'student' | 'corporate' | 'admin') => {
+    setRole(newRole);
+    if (newRole === 'corporate') {
+      setActiveTab('csr-hub');
+    }
+    closeMobileMenu();
+  };
+
+  const renderInnerContent = (isMobile = false) => (
+    <>
       {/* Brand Header */}
       <div className="p-4 border-b border-[#1D2133] space-y-1 bg-[#0D0F17] font-mono">
         <div className="flex items-center justify-between">
@@ -248,9 +262,20 @@ export const Sidebar: React.FC = () => {
               CITY GUARDIAN
             </span>
           </h1>
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] font-bold">
-            SQUID EDITION
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] font-bold">
+              SQUID EDITION
+            </span>
+            {isMobile && (
+              <button
+                onClick={closeMobileMenu}
+                className="text-slate-400 hover:text-white p-1 rounded hover:bg-[#1D2133]"
+                aria-label="Close Mobile Menu"
+              >
+                <X className="w-5 h-5 text-[#FF007A]" />
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex items-center justify-between text-[10px] text-[#03E5B7]">
           <span>CONTESTANT ARENA // R7</span>
@@ -266,8 +291,8 @@ export const Sidebar: React.FC = () => {
         <span className="text-slate-400 text-[10px] font-bold">ROLE //</span>
         <div className="inline-flex p-0.5 rounded bg-[#07080E] border border-[#1D2133]">
           <button
-            onClick={() => setRole('student')}
-            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+            onClick={() => handleRoleChange('student')}
+            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${
               role === 'student'
                 ? 'bg-[#03E5B7] text-[#07080E] shadow-sm glow-teal'
                 : 'text-slate-400 hover:text-white'
@@ -276,11 +301,8 @@ export const Sidebar: React.FC = () => {
             #456 PLAYER
           </button>
           <button
-            onClick={() => {
-              setRole('corporate');
-              setActiveTab('csr-hub');
-            }}
-            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+            onClick={() => handleRoleChange('corporate')}
+            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
               role === 'corporate'
                 ? 'bg-[#FFC700] text-[#07080E] shadow-sm glow-gold'
                 : 'text-slate-400 hover:text-white'
@@ -290,8 +312,8 @@ export const Sidebar: React.FC = () => {
             CSR
           </button>
           <button
-            onClick={() => setRole('admin')}
-            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+            onClick={() => handleRoleChange('admin')}
+            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
               role === 'admin'
                 ? 'bg-[#FF007A] text-white shadow-sm glow-pink'
                 : 'text-slate-400 hover:text-white'
@@ -317,8 +339,8 @@ export const Sidebar: React.FC = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-sans font-medium transition-all ${
+                    onClick={() => handleItemClick(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all ${
                       isActive
                         ? 'bg-[#180B1B] border border-[#FF007A] text-white font-bold shadow-[0_0_15px_rgba(255,0,122,0.3)] border-l-4 border-l-[#FF007A]'
                         : 'text-slate-300 hover:text-white hover:bg-[#0D0F17] border border-transparent'
@@ -361,7 +383,7 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Footer Player Info Card */}
       <div className="p-2.5 border-t border-[#1D2133] bg-[#0D0F17]">
         <div
-          onClick={() => setActiveTab('community-profile')}
+          onClick={() => handleItemClick('community-profile')}
           className="p-2 rounded bg-[#07080E] border border-[#FF007A]/40 hover:border-[#FF007A] cursor-pointer transition-all flex items-center justify-between"
         >
           <div className="flex items-center gap-2.5">
@@ -381,7 +403,31 @@ export const Sidebar: React.FC = () => {
           <ChevronRight className="w-4 h-4 text-[#FF007A]" />
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Persistent Desktop Navigation Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-[#07080E] border-r border-[#1D2133] h-screen sticky top-0 z-40 select-none font-mono">
+        {renderInnerContent(false)}
+      </aside>
+
+      {/* Mobile Drawer Overlay & Slide-over Navigation */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          {/* Backdrop Blur */}
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={closeMobileMenu}
+          />
+          {/* Slide-over Container */}
+          <aside className="relative flex flex-col w-72 max-w-[85vw] bg-[#07080E] border-r border-[#1D2133] h-full shadow-2xl z-10 select-none font-mono animate-in slide-in-from-left duration-200">
+            {renderInnerContent(true)}
+          </aside>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -88,6 +88,12 @@ interface EcoContextType {
   chatMessages: ChatMessage[];
   toasts: Toast[];
 
+  // Mobile Navigation Drawer State
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
+  toggleMobileMenu: () => void;
+  closeMobileMenu: () => void;
+
   // Features State
   surplusFoodListings: SurplusFoodListing[];
   ngoRequests: NGORequest[];
@@ -151,6 +157,10 @@ interface EcoContextType {
 const EcoContext = createContext<EcoContextType | undefined>(undefined);
 
 export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   const [role, setRole] = useState<UserRole>('student');
   const [activeTab, setActiveTab] = useState<MainTab>('overview');
   const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
@@ -657,6 +667,10 @@ Options available:
   return (
     <EcoContext.Provider
       value={{
+        isMobileMenuOpen,
+        setIsMobileMenuOpen,
+        toggleMobileMenu,
+        closeMobileMenu,
         role,
         setRole,
         activeTab,
