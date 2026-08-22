@@ -238,9 +238,9 @@ export const Sidebar: React.FC = () => {
       : studentSections;
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-[#07080E] border-r border-[#1D2133] h-screen sticky top-0 z-40 select-none font-mono">
+    <aside className="hidden md:flex flex-col w-64 bg-[#07080E] border-r border-[#1D2133] h-screen sticky top-0 z-40 select-none font-sans">
       {/* Brand Header */}
-      <div className="p-4 border-b border-[#1D2133] space-y-1 bg-[#0D0F17]">
+      <div className="p-4 border-b border-[#1D2133] space-y-1 bg-[#0D0F17] font-mono">
         <div className="flex items-center justify-between">
           <h1 className="font-black text-xl text-white tracking-wider flex items-center gap-2">
             <span className="text-[#FF007A] text-lg font-bold">◯ △ □</span>
@@ -262,12 +262,12 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Role Mode Selector */}
-      <div className="px-3 py-2 bg-[#0D0F17] border-b border-[#1D2133] flex items-center justify-between text-xs">
+      <div className="px-3 py-2 bg-[#0D0F17] border-b border-[#1D2133] flex items-center justify-between text-xs font-sans">
         <span className="text-slate-400 text-[10px] font-bold">ROLE //</span>
         <div className="inline-flex p-0.5 rounded bg-[#07080E] border border-[#1D2133]">
           <button
             onClick={() => setRole('student')}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${
+            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
               role === 'student'
                 ? 'bg-[#03E5B7] text-[#07080E] shadow-sm glow-teal'
                 : 'text-slate-400 hover:text-white'
@@ -280,9 +280,9 @@ export const Sidebar: React.FC = () => {
               setRole('corporate');
               setActiveTab('csr-hub');
             }}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
               role === 'corporate'
-                ? 'bg-[#FFC700] text-[#07080E] shadow-sm font-extrabold glow-gold'
+                ? 'bg-[#FFC700] text-[#07080E] shadow-sm glow-gold'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -291,7 +291,7 @@ export const Sidebar: React.FC = () => {
           </button>
           <button
             onClick={() => setRole('admin')}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
               role === 'admin'
                 ? 'bg-[#FF007A] text-white shadow-sm glow-pink'
                 : 'text-slate-400 hover:text-white'
@@ -307,7 +307,7 @@ export const Sidebar: React.FC = () => {
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar">
         {currentSections.map((sec) => (
           <div key={sec.title}>
-            <div className="px-2 mb-1.5 text-[9px] font-bold text-[#FF007A] tracking-widest uppercase flex items-center justify-between">
+            <div className="px-2 mb-1.5 text-[9px] font-bold text-[#FF007A] tracking-widest uppercase flex items-center justify-between font-sans">
               <span>{sec.title}</span>
             </div>
             <div className="space-y-0.5">
@@ -318,7 +318,7 @@ export const Sidebar: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-sans font-medium transition-all ${
                       isActive
                         ? 'bg-[#180B1B] border border-[#FF007A] text-white font-bold shadow-[0_0_15px_rgba(255,0,122,0.3)] border-l-4 border-l-[#FF007A]'
                         : 'text-slate-300 hover:text-white hover:bg-[#0D0F17] border border-transparent'

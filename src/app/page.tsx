@@ -46,6 +46,8 @@ import { AdminOverviewView } from '../components/views/AdminOverviewView';
 import { CleanupOperationsView } from '../components/views/CleanupOperationsView';
 import { MaterialFlowView } from '../components/views/MaterialFlowView';
 import { UserManagementView } from '../components/views/UserManagementView';
+import { ShinchanCollector } from '../components/game/ShinchanCollector';
+import { SquidCyberBackground } from '../components/layout/SquidCyberBackground';
 
 // Corporate Impact Arena (CSR) Views
 import { CsrHubView } from '../components/views/csr/CsrHubView';
@@ -177,18 +179,24 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative">
+      {/* Dim Atmospheric Cyber Hacker Background & Matrix Streams */}
+      <SquidCyberBackground />
+
       {/* Persistent Navigation Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative z-10">
         <Header />
 
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto pb-20 md:pb-8">
+        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto pb-28 md:pb-24">
           {renderActiveView()}
         </main>
       </div>
+
+      {/* Shinchan in Squid Game Outfit Garbage Collector Mascot */}
+      <ShinchanCollector />
     </div>
   );
 }
