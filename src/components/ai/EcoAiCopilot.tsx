@@ -51,11 +51,41 @@ export const EcoAiCopilot: React.FC = () => {
 
         <button
           onClick={() => sendChatMessage('Analyze overall campus sustainability baseline.')}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#07080E] border border-[#1D2133] text-slate-300 text-xs hover:border-[#FF007A] hover:text-[#FF007A] transition-colors"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#07080E] border border-[#1D2133] text-slate-300 text-xs hover:border-[#FF007A] hover:text-[#FF007A] transition-colors font-mono"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Reset Chat
         </button>
+      </div>
+
+      {/* 🔴 MEKO SAB AATA HAI MEME HERO BANNER WITH LEFT QUOTE TEXT */}
+      <div className="relative overflow-hidden rounded-2xl bg-[#07080E] border-2 border-[#FF007A] p-6 md:p-8 flex items-end justify-between min-h-[220px] shadow-2xl glow-pink">
+        {/* Background Image: Rajpal Yadav Meme */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+          <img
+            src="/images/squid-game/meko-sab-ata-h-meme.jpg"
+            alt="Meko Sab Aata Hai Meme"
+            className="w-full h-full object-cover opacity-75"
+          />
+        </div>
+
+        {/* Dark Gradient Overlays for Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07080E] via-transparent to-transparent pointer-events-none z-0" />
+        <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-[#07080E]/85 via-[#07080E]/60 to-transparent pointer-events-none z-0" />
+
+        {/* Left Side Quote Text & Powered By Badge */}
+        <div className="relative z-10 space-y-3 max-w-xl">
+          <h3 className="text-2xl md:text-3xl font-black italic tracking-wide text-white drop-shadow-xl leading-tight">
+            “Main, <span className="text-[#FF007A]">merko sab aata hai,</span> <br />
+            <span className="text-[#FF007A]">main expert hoon</span>”
+          </h3>
+
+          <div className="pt-1">
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest bg-black/70 px-2.5 py-1 rounded border border-[#1D2133] backdrop-blur-md">
+              POWERED BY FRONT MAN AI
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Suggested Questions Grid */}
