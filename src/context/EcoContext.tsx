@@ -76,6 +76,8 @@ interface EcoContextType {
   role: UserRole;
   setRole: (r: UserRole) => void;
   activeTab: MainTab;
+  adminActiveSection: string;
+  setAdminActiveSection: (sec: string) => void;
   setActiveTab: (tab: MainTab) => void;
   profile: UserProfile;
   wasteReports: WasteReport[];
@@ -253,7 +255,7 @@ export const getDefaultDailyMissions = (dateStr: string): DailyMission[] => [
 ];
 
 export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://prototype-ecoverse-backend-jumu.onrender.com/api';
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
@@ -343,6 +345,7 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [role, setRole] = useState<UserRole>('student');
   const [activeTabState, setActiveTabState] = useState<MainTab>('overview');
+  const [adminActiveSection, setAdminActiveSection] = useState<string>('waste-reports');
 
   useEffect(() => {
     if (pathname) {
@@ -2149,3 +2152,6 @@ export const useEco = () => {
   }
   return context;
 };
+
+
+
