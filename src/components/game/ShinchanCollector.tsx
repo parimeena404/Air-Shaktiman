@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Recycle, HelpCircle } from 'lucide-react';
+import { Sparkles, Recycle, Heart } from 'lucide-react';
 import { useEco } from '../../context/EcoContext';
 
 export const ShinchanCollector: React.FC = () => {
@@ -12,8 +12,8 @@ export const ShinchanCollector: React.FC = () => {
   // 1. 'slideIn': Shinchan & Shiro stroll together from left to center waste sack
   // 2. 'bendDown': Shinchan bends down to grab the sack while Shiro waits patiently
   // 3. 'heaveShoulder': Shinchan hoists heavy sack onto shoulder
-  // 4. 'carrySlideOut': Shinchan runs right to recycling hub; Shiro gets left behind & turns back to left
-  // 5. 'depositSack': Shinchan tosses sack into Eco Hub recycling bin with sparkles
+  // 4. 'carrySlideOut': Shinchan runs right to Nanako Didi & Eco Hub; Shiro gets left behind & turns back left
+  // 5. 'depositSack': Shinchan tosses sack into Eco Hub; Nanako Didi praises Shinchan
   // 6. 'hidden': Pause before next loop restarts from left
   const [phase, setPhase] = useState<
     'slideIn' | 'bendDown' | 'heaveShoulder' | 'carrySlideOut' | 'depositSack' | 'hidden'
@@ -32,12 +32,18 @@ export const ShinchanCollector: React.FC = () => {
   const [shiroSpeechText, setShiroSpeechText] = useState('Bow-wow! 🐾');
   const [shiroClickCount, setShiroClickCount] = useState(0);
 
+  const [showNanakoSpeech, setShowNanakoSpeech] = useState(false);
+  const [nanakoSpeechText, setNanakoSpeechText] = useState("Oh Shinchan! You're doing good work! ❤️");
+  const [nanakoClickCount, setNanakoClickCount] = useState(0);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     let shiroTimer: NodeJS.Timeout;
+    let nanakoTimer: NodeJS.Timeout;
 
     if (phase === 'slideIn') {
       setShiroSubState('normal');
+      setShowNanakoSpeech(false);
       // Smooth stroll from left to center (takes 6.5s)
       timer = setTimeout(() => {
         setPhase('bendDown');
@@ -68,21 +74,34 @@ export const ShinchanCollector: React.FC = () => {
         setTimeout(() => setShowShiroSpeech(false), 2000);
       }, 1300);
 
+      // As Shinchan nears Nanako Didi at the right (~3.8s in)
+      nanakoTimer = setTimeout(() => {
+        setShowNanakoSpeech(true);
+        setNanakoSpeechText("Oh Shinchan! You're doing good work! ❤️");
+        setShowShinchanSpeech(true);
+        setShinchanSpeechText('Nanako Didi! I did it for you~ 😍💖');
+      }, 3800);
+
       // Shinchan slides to right edge carrying sack (takes 6.5s)
       timer = setTimeout(() => {
         setPhase('depositSack');
-        setShowShinchanSpeech(true);
-        setShinchanSpeechText('Recycled at Eco Hub! ✨♻️');
       }, 6500);
     } else if (phase === 'depositSack') {
-      // Deposits sack into bin (takes 1.5s)
+      // Deposits sack into bin with praise from Nanako Didi (takes 1.8s)
+      setShowNanakoSpeech(true);
+      setNanakoSpeechText('So proud of you, Shinchan! ✨♻️');
+      setShowShinchanSpeech(true);
+      setShinchanSpeechText('Recycled at Eco Hub! Hehe~ 🍑✨');
+
       timer = setTimeout(() => {
         setShowShinchanSpeech(false);
         setShowShiroSpeech(false);
+        setShowNanakoSpeech(false);
         setPhase('hidden');
-      }, 1500);
+      }, 1800);
     } else if (phase === 'hidden') {
       setShiroSubState('normal');
+      setShowNanakoSpeech(false);
       // Waits 3.5s before looping again from left
       timer = setTimeout(() => {
         setPhase('slideIn');
@@ -92,6 +111,7 @@ export const ShinchanCollector: React.FC = () => {
     return () => {
       clearTimeout(timer);
       clearTimeout(shiroTimer);
+      clearTimeout(nanakoTimer);
     };
   }, [phase]);
 
@@ -99,10 +119,10 @@ export const ShinchanCollector: React.FC = () => {
     setShinchanClickCount((prev) => prev + 1);
     setShowShinchanSpeech(true);
     const quotes = [
+      'Nanako Didi is watching, I must clean Indore super fast! 😍✨',
       'Ooh! Carrying heavy trash for Indore Campus is fun~ 🍑✨',
       'Action Kamen Eco-Power Activated! ⚡',
       'Squid Game Guard Shinchan on Duty! ⭕',
-      'Heavy waste sack on my shoulder! (+10 Eco Points) ♻️',
       'Oops! Did I leave Shiro behind again? Hehe~ 🐕',
     ];
     setShinchanSpeechText(quotes[shinchanClickCount % quotes.length]);
@@ -115,13 +135,27 @@ export const ShinchanCollector: React.FC = () => {
     setShowShiroSpeech(true);
     const quotes = [
       'Bow-wow! (Shiro: I found discarded plastic!) 🐾♻️',
-      'Woof woof! Shinchan always forgets me when he finds waste! 🥺',
+      'Woof woof! Shinchan always forgets me when he sees Nanako Didi! 🥺',
       'Shiro rolls into a fluffy cotton ball! ⚪✨',
       'Bow! Clean campus guard dog on duty! 🐶⭐',
     ];
     setShiroSpeechText(quotes[shiroClickCount % quotes.length]);
     addToast('🐶 Shiro fetched recyclable waste! +5 Eco Points.', 'success');
     setTimeout(() => setShowShiroSpeech(false), 3000);
+  };
+
+  const handleNanakoClick = () => {
+    setNanakoClickCount((prev) => prev + 1);
+    setShowNanakoSpeech(true);
+    const quotes = [
+      "Oh Shinchan! You're doing good work! ❤️",
+      'Thank you for keeping our Indore campus so clean and green! 🌸✨',
+      "Shinchan is our smartest little Eco-Champion! 💖",
+      'Every bit of recycled waste helps our environment! ♻️🌿',
+    ];
+    setNanakoSpeechText(quotes[nanakoClickCount % quotes.length]);
+    addToast('🌸 Nanako Didi cheered for the Eco Patrol! +15 Eco Points.', 'success');
+    setTimeout(() => setShowNanakoSpeech(false), 3000);
   };
 
   // Whether the garbage bag in the center floor is still on the ground
@@ -165,8 +199,132 @@ export const ShinchanCollector: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {/* ============================================================ */}
+      {/* NANAKO DIDI (STANDING NEAR ECO RECYCLING HUB) */}
+      {/* ============================================================ */}
+      <div className="absolute bottom-1 right-28 pointer-events-auto cursor-pointer z-35 flex flex-col items-center">
+        {/* Nanako Didi Speech Bubble */}
+        <AnimatePresence>
+          {showNanakoSpeech && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: -6 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="absolute -top-14 -left-20 bg-[#0D0F17]/95 border-2 border-[#EC4899] text-[#FDF2F8] text-[11px] font-bold font-mono px-3 py-1.5 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.5)] whitespace-nowrap z-50 flex items-center gap-1.5"
+            >
+              <Heart className="w-3.5 h-3.5 text-[#EC4899] fill-[#EC4899] animate-pulse" />
+              <span>{nanakoSpeechText}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Nanako Didi SVG Artwork & Gentle Sway */}
+        <motion.div
+          animate={{
+            y: [0, -2, 0, -2, 0],
+            rotate: [0, 1, 0, -1, 0],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 3,
+            ease: 'easeInOut',
+          }}
+          onClick={handleNanakoClick}
+          className="relative filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] hover:brightness-110 transition-all"
+        >
+          <svg width="60" height="110" viewBox="0 0 100 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* 1. Hair Background Layer (Dark Forest Green/Black Long Hair) */}
+            <path
+              d="M48 18 C32 18 24 32 24 60 C24 95 30 115 32 135 C38 120 36 95 40 75 C44 65 50 60 52 55 C58 60 64 75 66 95 C68 118 72 128 75 118 C78 95 80 58 76 38 C72 18 60 18 48 18 Z"
+              fill="#1B3828"
+              stroke="#0E2015"
+              strokeWidth="2.5"
+            />
+
+            {/* 2. Legs & Shoes */}
+            {/* Left Leg */}
+            <path d="M42 108 L38 160 C38 164 36 168 33 170" stroke="#FCE7D6" strokeWidth="6" strokeLinecap="round" />
+            <ellipse cx="32" cy="172" rx="7" ry="3.5" fill="#60A5FA" stroke="#1E3A8A" strokeWidth="1.5" />
+
+            {/* Right Leg */}
+            <path d="M52 108 L54 160 C54 164 56 168 59 170" stroke="#FCE7D6" strokeWidth="6" strokeLinecap="round" />
+            <ellipse cx="60" cy="172" rx="7" ry="3.5" fill="#60A5FA" stroke="#1E3A8A" strokeWidth="1.5" />
+
+            {/* 3. Cream / Ivory Mini Skirt */}
+            <path
+              d="M37 72 L32 108 C42 110 56 110 67 108 L62 72 Z"
+              fill="#FEF9C3"
+              stroke="#1A1A24"
+              strokeWidth="2.5"
+            />
+            {/* Skirt pleat subtle crease */}
+            <path d="M50 74 L50 109" stroke="#E2E8F0" strokeWidth="1.2" />
+
+            {/* 4. Pink V-Neck Sweater Torso */}
+            <path
+              d="M38 44 C34 48 35 60 37 73 C46 75 54 75 62 73 C64 60 65 48 61 44 C56 46 43 46 38 44 Z"
+              fill="#F4A6B8"
+              stroke="#1A1A24"
+              strokeWidth="2.5"
+            />
+
+            {/* V-Neck Collar */}
+            <path d="M44 45 L49 52 L54 45" fill="#FCE7D6" stroke="#1A1A24" strokeWidth="2" />
+
+            {/* 5. Left Arm (Gently resting at hip) */}
+            <path d="M37 46 L30 68 L32 82" stroke="#F4A6B8" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="33" cy="84" r="3" fill="#FCE7D6" stroke="#1A1A24" strokeWidth="1.5" />
+
+            {/* 6. Right Arm (Raised Cheering / Waving Pose) */}
+            <path d="M61 46 L70 66 L78 88" stroke="#F4A6B8" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Right Hand Waving */}
+            <path d="M78 88 L83 94 M79 90 L85 93" stroke="#FCE7D6" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="81" cy="91" r="3.2" fill="#FCE7D6" stroke="#1A1A24" strokeWidth="1.2" />
+
+            {/* 7. Slender Neck & Head */}
+            <rect x="46" y="38" width="6" height="8" fill="#FCE7D6" stroke="#1A1A24" strokeWidth="1.5" />
+            {/* Face Shape */}
+            <path
+              d="M38 24 C36 34 38 46 49 46 C60 46 62 34 60 24 C56 22 42 22 38 24 Z"
+              fill="#FCE7D6"
+              stroke="#1A1A24"
+              strokeWidth="2"
+            />
+
+            {/* 8. Forehead Bangs Fringe */}
+            <path
+              d="M38 24 C44 28 54 28 60 24 C59 21 55 18 49 18 C43 18 39 21 38 24 Z"
+              fill="#1B3828"
+            />
+            <path d="M42 22 L42 28 M46 22 L46 29 M50 22 L50 29 M54 22 L54 28" stroke="#1B3828" strokeWidth="1.8" strokeLinecap="round" />
+
+            {/* 9. Beautiful Eyes & Smile */}
+            {/* Left Eyebrow & Eye */}
+            <path d="M41 27 C43 25 45 26 46 27" fill="none" stroke="#1A1A24" strokeWidth="1.5" strokeLinecap="round" />
+            <ellipse cx="43.5" cy="30" rx="2" ry="2.8" fill="#1A1A24" />
+            <circle cx="44" cy="29.2" r="0.8" fill="#FFFFFF" />
+            {/* Left Eyelash */}
+            <path d="M41.5 28.5 L40 28" stroke="#1A1A24" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Right Eyebrow & Eye */}
+            <path d="M52 27 C53 25 55 26 57 27" fill="none" stroke="#1A1A24" strokeWidth="1.5" strokeLinecap="round" />
+            <ellipse cx="54.5" cy="30" rx="2" ry="2.8" fill="#1A1A24" />
+            <circle cx="55" cy="29.2" r="0.8" fill="#FFFFFF" />
+            {/* Right Eyelash */}
+            <path d="M56.5 28.5 L58 28" stroke="#1A1A24" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Rosy Cheeks */}
+            <ellipse cx="40" cy="34" rx="2.5" ry="1.2" fill="#F43F5E" fillOpacity="0.5" />
+            <ellipse cx="58" cy="34" rx="2.5" ry="1.2" fill="#F43F5E" fillOpacity="0.5" />
+
+            {/* Gentle Smile */}
+            <path d="M46 36 C48 38 50 38 52 36" fill="none" stroke="#E11D48" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </motion.div>
+      </div>
+
       {/* Right-side Eco Recycling Hub Portal */}
-      <div className="absolute bottom-2 right-4 flex items-center gap-1.5 opacity-90 pointer-events-auto">
+      <div className="absolute bottom-2 right-3 flex items-center gap-1.5 opacity-90 pointer-events-auto">
         <div className="p-2.5 rounded-2xl bg-[#0D0F17] border border-[#03E5B7]/60 flex items-center gap-2 shadow-[0_0_20px_rgba(3,229,183,0.25)]">
           <Recycle className="w-5 h-5 text-[#03E5B7] animate-spin" style={{ animationDuration: '6s' }} />
           <div className="font-mono text-[10px] text-[#03E5B7] font-bold hidden sm:block">
@@ -411,9 +569,9 @@ export const ShinchanCollector: React.FC = () => {
               : phase === 'bendDown' || phase === 'heaveShoulder'
               ? 'calc(50% - 62px)'
               : phase === 'carrySlideOut'
-              ? 'calc(100% - 100px)'
+              ? 'calc(100% - 170px)'
               : phase === 'depositSack'
-              ? 'calc(100% - 85px)'
+              ? 'calc(100% - 150px)'
               : 'calc(100% + 140px)',
         }}
         transition={{
@@ -658,4 +816,5 @@ export const ShinchanCollector: React.FC = () => {
     </div>
   );
 };
+
 
