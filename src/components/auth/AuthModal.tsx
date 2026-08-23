@@ -161,9 +161,22 @@ export const AuthModal: React.FC = () => {
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
-              Email Address
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
+                Email Address
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('thakrethe@gmail.com');
+                  setPassword('thakrethe@gmail.com');
+                }}
+                className="text-[10px] font-mono text-[#03E5B7] hover:underline flex items-center gap-1"
+              >
+                <Shield className="w-3 h-3 text-[#03E5B7]" />
+                <span>Admin Quick Fill (thakrethe@gmail.com)</span>
+              </button>
+            </div>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
               <input
@@ -171,7 +184,7 @@ export const AuthModal: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="player456@ecoverse.io"
+                placeholder="thakrethe@gmail.com"
                 className="w-full pl-9 pr-3 py-2 bg-[#0D0F17] border border-[#1D2133] rounded-lg text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#03E5B7] transition-all"
               />
             </div>
