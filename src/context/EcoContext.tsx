@@ -269,7 +269,11 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setActiveTab = (tab: MainTab) => {
     setActiveTabState(tab);
-    const targetPath = tab === 'overview' ? '/' : `/${tab}`;
+    let portalPrefix = '/user';
+    if (role === 'admin') portalPrefix = '/organization';
+    else if (role === 'corporate') portalPrefix = '/csr';
+
+    const targetPath = tab === 'overview' ? portalPrefix : `${portalPrefix}/${tab}`;
     if (pathname !== targetPath) {
       router.push(targetPath, { scroll: false });
     }

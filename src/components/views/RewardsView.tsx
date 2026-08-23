@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { useEco } from '../../context/EcoContext';
-import { Gift, Coins, CheckCircle2, Award, Sparkles, Coffee, Ticket, ShoppingBag } from 'lucide-react';
+import { useWeb3 } from '../../context/Web3Context';
+import { Gift, Coins, CheckCircle2, Award, Sparkles, Coffee, Ticket, ShoppingBag, Wallet } from 'lucide-react';
 
 export const RewardsView: React.FC = () => {
   const { profile, rewards, redeemReward } = useEco();
+  const { account, connectWallet, isConnecting } = useWeb3();
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -40,6 +42,24 @@ export const RewardsView: React.FC = () => {
             {profile.ecoPoints.toLocaleString()}
           </div>
           <div className="text-[10px] text-[#03E5B7] font-mono">Next Tier: 5,000 pts (Eco Master)</div>
+          
+          <div className="pt-3 mt-3 border-t border-slate-800">
+            {account ? (
+              <div className="text-xs font-mono font-bold text-[#03E5B7] flex items-center justify-center gap-2">
+                <Wallet className="w-4 h-4" />
+                {account.substring(0, 6)}...{account.substring(account.length - 4)}
+              </div>
+            ) : (
+              <button
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="w-full py-2 bg-[#F6851B]/10 hover:bg-[#F6851B]/20 border border-[#F6851B]/50 text-[#F6851B] text-[10px] font-mono font-bold rounded flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <Wallet className="w-4 h-4" />
+                {isConnecting ? 'Connecting...' : 'CONNECT METAMASK'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

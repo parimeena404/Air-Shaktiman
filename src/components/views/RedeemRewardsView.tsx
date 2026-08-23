@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
+import { useWeb3 } from '../../context/Web3Context';
 import { RedeemedVoucher } from '../../types';
-import { Gift, Coins, CheckCircle2, QrCode, ArrowRight, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Gift, Coins, CheckCircle2, QrCode, ArrowRight, ShieldCheck, Sparkles, X, Wallet } from 'lucide-react';
 
 export const RedeemRewardsView: React.FC = () => {
   const { profile, rewards, redeemPartnerVoucher, setActiveTab } = useEco();
+  const { account, connectWallet, isConnecting } = useWeb3();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [confirmReward, setConfirmReward] = useState<{ title: string; business: string; cost: number; discount: number } | null>(null);
@@ -57,6 +59,23 @@ export const RedeemRewardsView: React.FC = () => {
             <span>{profile.ecoPoints.toLocaleString()}</span>
           </div>
           <div className="text-[10px] text-[#03E5B7]">Level: {profile.level} (840 pts to Tier 4)</div>
+          
+          <div className="pt-2 mt-2 border-t border-slate-800">
+            {account ? (
+              <div className="text-[10px] font-bold text-[#03E5B7] flex items-center justify-end gap-1">
+                <Wallet className="w-3 h-3" />
+                {account.substring(0, 6)}...{account.substring(account.length - 4)}
+              </div>
+            ) : (
+              <button
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="w-full py-1.5 bg-[#F6851B]/10 hover:bg-[#F6851B]/20 border border-[#F6851B]/50 text-[#F6851B] text-[10px] font-bold rounded transition-colors disabled:opacity-50"
+              >
+                CONNECT METAMASK
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { EcoProvider } from '../context/EcoContext';
+import { Web3Provider } from '../context/Web3Context';
 
 export const metadata: Metadata = {
   title: 'City Guardian — AI-Powered Circular Campus Platform',
@@ -23,7 +24,9 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-squid-dark text-slate-100 min-h-screen antialiased squid-grid-bg font-sans">
-        <EcoProvider>{children}</EcoProvider>
+        <Web3Provider>
+          <EcoProvider>{children}</EcoProvider>
+        </Web3Provider>
       </body>
     </html>
   );
