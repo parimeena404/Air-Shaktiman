@@ -200,10 +200,18 @@ export const ShinchanCollector: React.FC = () => {
       </AnimatePresence>
 
       {/* ============================================================ */}
-      {/* RIGHT CORNER: ECO HUB RECYCLING BOX & PROPORTIONAL NANAKO DIDI */}
+      {/* RIGHT CORNER: ECO HUB RECYCLING BOX (LEFT) & NANAKO DIDI AT THE END (RIGHT) */}
       {/* ============================================================ */}
-      <div className="absolute bottom-1 right-2 sm:right-4 flex items-end gap-2 pointer-events-auto z-35">
-        {/* Nanako Didi Standing in front / at the corner */}
+      <div className="absolute bottom-1 right-2 sm:right-4 flex items-end gap-2.5 pointer-events-auto z-35">
+        {/* 1. Eco Hub Recycling Box (Where Shinchan deposits the waste) */}
+        <div className="p-2.5 mb-2 rounded-2xl bg-[#0D0F17] border border-[#03E5B7]/60 flex items-center gap-2 shadow-[0_0_20px_rgba(3,229,183,0.25)]">
+          <Recycle className="w-5 h-5 text-[#03E5B7] animate-spin" style={{ animationDuration: '6s' }} />
+          <div className="font-mono text-[10px] text-[#03E5B7] font-bold hidden sm:block">
+            ECO HUB RECYCLING
+          </div>
+        </div>
+
+        {/* 2. Nanako Didi Standing at the FAR RIGHT END of the Box */}
         <div className="relative flex flex-col items-center cursor-pointer" onClick={handleNanakoClick}>
           {/* Nanako Didi Speech Bubble */}
           <AnimatePresence>
@@ -220,7 +228,7 @@ export const ShinchanCollector: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Nanako Didi SVG Artwork (TALL & BEAUTIFULLY PROPORTIONED) */}
+          {/* Nanako Didi SVG Artwork (TALL & BEAUTIFULLY PROPORTIONED AT THE END OF BOX) */}
           <motion.div
             animate={{
               y: [0, -3, 0, -3, 0],
@@ -233,7 +241,7 @@ export const ShinchanCollector: React.FC = () => {
             }}
             className="relative filter drop-shadow-[0_4px_14px_rgba(0,0,0,0.7)] hover:brightness-110 transition-all"
           >
-            {/* Height 168px - distinctly taller adult next to small Shinchan */}
+            {/* Height 168px - tall adult standing at the end of the recycling box */}
             <svg width="88" height="168" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               {/* 1. Hair Background Layer (Dark Forest Green Long Hair) */}
               <path
@@ -277,7 +285,7 @@ export const ShinchanCollector: React.FC = () => {
               <path d="M37 48 L28 72 L31 88" stroke="#F4A6B8" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="32" cy="90" r="3.5" fill="#FCE7D6" stroke="#1A1A24" strokeWidth="1.5" />
 
-              {/* 6. Right Arm (Raised Cheering / Waving Pose) */}
+              {/* 6. Right Arm (Raised Cheering / Waving Pose towards Shinchan) */}
               <path d="M63 48 L73 70 L82 94" stroke="#F4A6B8" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
               {/* Right Hand Waving */}
               <path d="M82 94 L87 101 M83 96 L90 99" stroke="#FCE7D6" strokeWidth="3" strokeLinecap="round" />
@@ -323,14 +331,6 @@ export const ShinchanCollector: React.FC = () => {
               <path d="M46 38 C48 40 50 40 52 38" fill="none" stroke="#E11D48" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </motion.div>
-        </div>
-
-        {/* Eco Hub Recycling Box (Behind / Beside Nanako Didi) */}
-        <div className="p-2.5 mb-2 rounded-2xl bg-[#0D0F17] border border-[#03E5B7]/60 flex items-center gap-2 shadow-[0_0_20px_rgba(3,229,183,0.25)]">
-          <Recycle className="w-5 h-5 text-[#03E5B7] animate-spin" style={{ animationDuration: '6s' }} />
-          <div className="font-mono text-[10px] text-[#03E5B7] font-bold hidden sm:block">
-            ECO HUB RECYCLING
-          </div>
         </div>
       </div>
 
@@ -561,9 +561,9 @@ export const ShinchanCollector: React.FC = () => {
               : phase === 'bendDown' || phase === 'heaveShoulder'
               ? 'calc(50% - 62px)'
               : phase === 'carrySlideOut'
-              ? 'calc(100% - 240px)'
+              ? 'calc(100% - 310px)'
               : phase === 'depositSack'
-              ? 'calc(100% - 210px)'
+              ? 'calc(100% - 285px)'
               : 'calc(100% + 140px)',
         }}
         transition={{
