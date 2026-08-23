@@ -61,7 +61,6 @@ import { CsrLeaderboardView } from '../components/views/csr/CsrLeaderboardView';
 import { CsrReportsView } from '../components/views/csr/CsrReportsView';
 import { AuthGateView } from '../components/auth/AuthGateView';
 import { useRouter } from 'next/navigation';
-import { SquidCyberBackground } from '../components/layout/SquidCyberBackground';
 
 export default function Home() {
   const { isAuthenticated, token, role } = useEco();

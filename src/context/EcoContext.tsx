@@ -316,6 +316,25 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         } catch (e) {}
       }
+      const savedAlerts = localStorage.getItem('ecoverse_system_alerts');
+      if (savedAlerts) {
+        try {
+          const parsedAlerts = JSON.parse(savedAlerts);
+          if (Array.isArray(parsedAlerts) && parsedAlerts.length > 0) {
+            setAlerts(parsedAlerts.slice(0, 5));
+          }
+        } catch (e) {}
+      }
+      const today = getTodayKey();
+      const savedMissions = localStorage.getItem(`ecoverse_daily_missions_${today}`);
+      if (savedMissions) {
+        try {
+          const parsedMissions = JSON.parse(savedMissions);
+          if (Array.isArray(parsedMissions) && parsedMissions.length > 0) {
+            setDailyMissions(parsedMissions);
+          }
+        } catch (e) {}
+      }
     }
   }, []);
 
@@ -379,20 +398,7 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [rewards, setRewards] = useState<RewardItem[]>(initialRewardItems);
   const [leaderboard] = useState<LeaderboardUser[]>(initialLeaderboard);
   const [telemetry] = useState<CampusTelemetry>(initialCampusTelemetry);
-  const [alerts, setAlerts] = useState<AIAlert[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('ecoverse_system_alerts');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.slice(0, 5);
-          }
-        }
-      } catch (e) {}
-    }
-    return initialAiAlerts.slice(0, 5);
-  });
+  const [alerts, setAlerts] = useState<AIAlert[]>(() => initialAiAlerts.slice(0, 5));
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Features State Providers
@@ -421,14 +427,6 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Daily Missions State Provider with Daily Rotation
   const [dailyMissions, setDailyMissions] = useState<DailyMission[]>(() => {
     const today = getTodayKey();
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(`ecoverse_daily_missions_${today}`);
-        if (saved) {
-          return JSON.parse(saved);
-        }
-      } catch (e) {}
-    }
     return getDefaultDailyMissions(today);
   });
 

@@ -7,7 +7,7 @@ import { Gift, Coins, CheckCircle2, Award, Sparkles, Coffee, Ticket, ShoppingBag
 
 export const RewardsView: React.FC = () => {
   const { profile, rewards, redeemReward } = useEco();
-  const { account, connectWallet, isConnecting } = useWeb3();
+  const { account, connectWallet, connectDemoWallet, disconnectWallet, isConnecting, hasMetaMask, error } = useWeb3();
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -35,7 +35,7 @@ export const RewardsView: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-[#07080E]/90 border border-[#FFC700]/60 p-5 rounded-2xl text-center space-y-1">
+        <div className="bg-[#07080E]/90 border border-[#FFC700]/60 p-5 rounded-2xl text-center space-y-1 min-w-[260px]">
           <div className="text-[10px] text-slate-400 font-mono font-bold">ECO POINTS BALANCE</div>
           <div className="text-4xl font-extrabold text-[#FFC700] font-mono flex items-center justify-center gap-2">
             <Coins className="w-8 h-8 text-[#FFC700]" />
@@ -43,21 +43,42 @@ export const RewardsView: React.FC = () => {
           </div>
           <div className="text-[10px] text-[#03E5B7] font-mono">Next Tier: 5,000 pts (Eco Master)</div>
           
-          <div className="pt-3 mt-3 border-t border-slate-800">
+          <div className="pt-3 mt-3 border-t border-slate-800 space-y-2">
             {account ? (
-              <div className="text-xs font-mono font-bold text-[#03E5B7] flex items-center justify-center gap-2">
-                <Wallet className="w-4 h-4" />
-                {account.substring(0, 6)}...{account.substring(account.length - 4)}
+              <div className="space-y-1">
+                <div className="text-xs font-mono font-bold text-[#03E5B7] flex items-center justify-center gap-2 bg-[#03E5B7]/10 py-1.5 px-3 rounded-lg border border-[#03E5B7]/30">
+                  <Wallet className="w-4 h-4 text-[#03E5B7]" />
+                  <span>{account.substring(0, 6)}...{account.substring(account.length - 4)}</span>
+                </div>
+                <button
+                  onClick={disconnectWallet}
+                  className="text-[10px] text-slate-400 hover:text-red-400 font-mono underline transition-colors"
+                >
+                  Disconnect Wallet
+                </button>
               </div>
             ) : (
-              <button
-                onClick={connectWallet}
-                disabled={isConnecting}
-                className="w-full py-2 bg-[#F6851B]/10 hover:bg-[#F6851B]/20 border border-[#F6851B]/50 text-[#F6851B] text-[10px] font-mono font-bold rounded flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <Wallet className="w-4 h-4" />
-                {isConnecting ? 'Connecting...' : 'CONNECT METAMASK'}
-              </button>
+              <div className="space-y-1.5">
+                <button
+                  onClick={connectWallet}
+                  disabled={isConnecting}
+                  className="w-full py-2 bg-[#F6851B] hover:bg-[#E2761B] text-white text-[11px] font-mono font-bold rounded-lg flex items-center justify-center gap-2 transition-all shadow-md shadow-[#F6851B]/30 disabled:opacity-50 cursor-pointer"
+                >
+                  <Wallet className="w-4 h-4" />
+                  {isConnecting ? 'Opening MetaMask...' : hasMetaMask ? 'CONNECT METAMASK' : 'INSTALL / CONNECT METAMASK'}
+                </button>
+                <button
+                  onClick={connectDemoWallet}
+                  className="text-[10px] text-slate-400 hover:text-[#03E5B7] font-mono underline transition-colors"
+                >
+                  Or use Demo Web3 Wallet
+                </button>
+              </div>
+            )}
+            {error && (
+              <div className="p-2 bg-red-950/60 border border-red-800/60 rounded text-[10px] text-red-300 font-mono text-left leading-tight">
+                ⚠️ {error}
+              </div>
             )}
           </div>
         </div>

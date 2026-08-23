@@ -7,7 +7,9 @@ interface Web3ContextType {
   account: string | null;
   provider: BrowserProvider | null;
   isConnecting: boolean;
+  hasMetaMask: boolean;
   connectWallet: () => Promise<void>;
+  connectDemoWallet: () => void;
   disconnectWallet: () => void;
   error: string | null;
 }
@@ -22,71 +24,129 @@ export const useWeb3 = () => {
   return context;
 };
 
+// Helper to reliably find MetaMask in various browser environments
+const getEthereumProvider = () => {
+  if (typeof window === 'undefined') return null;
+  const anyWin = window as any;
+  if (!anyWin.ethereum) return null;
+
+  // Handle multi-wallet extensions
+  if (Array.isArray(anyWin.ethereum.providers)) {
+    const mm = anyWin.ethereum.providers.find((p: any) => p.isMetaMask);
+    if (mm) return mm;
+    return anyWin.ethereum.providers[0];
+  }
+
+  return anyWin.ethereum;
+};
+
 export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [hasMetaMask, setHasMetaMask] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if wallet was previously connected
-    const checkConnection = async () => {
-      if (typeof window !== 'undefined' && (window as any).ethereum) {
-        try {
-          const _provider = new ethers.BrowserProvider((window as any).ethereum);
-          setProvider(_provider);
-          
-          const accounts = await _provider.listAccounts();
-          if (accounts.length > 0) {
-            setAccount(accounts[0].address);
-          }
-        } catch (err) {
-          console.error("Failed to check Web3 connection", err);
-        }
-      }
-    };
-    checkConnection();
+    const ethereum = getEthereumProvider();
+    setHasMetaMask(!!ethereum);
 
-    // Listen for account changes
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
-      (window as any).ethereum.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length > 0) {
+    if (ethereum) {
+      try {
+        const _provider = new ethers.BrowserProvider(ethereum);
+        setProvider(_provider);
+
+        // Check if wallet is already connected without prompting popup
+        ethereum
+          .request({ method: 'eth_accounts' })
+          .then((accounts: string[]) => {
+            if (accounts && accounts.length > 0) {
+              setAccount(accounts[0]);
+            }
+          })
+          .catch((err: any) => console.warn('Web3 check accounts error:', err));
+      } catch (err) {
+        console.warn('Web3 init provider error:', err);
+      }
+
+      // Listen for account switching
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (accounts && accounts.length > 0) {
           setAccount(accounts[0]);
+          setError(null);
         } else {
           setAccount(null);
         }
-      });
+      };
+
+      const handleChainChanged = () => {
+        try {
+          const _provider = new ethers.BrowserProvider(ethereum);
+          setProvider(_provider);
+        } catch (e) {}
+      };
+
+      ethereum.on?.('accountsChanged', handleAccountsChanged);
+      ethereum.on?.('chainChanged', handleChainChanged);
+
+      return () => {
+        ethereum.removeListener?.('accountsChanged', handleAccountsChanged);
+        ethereum.removeListener?.('chainChanged', handleChainChanged);
+      };
     }
   }, []);
 
   const connectWallet = async () => {
-    if (typeof window === 'undefined' || !(window as any).ethereum) {
-      setError('MetaMask is not installed. Please install it to use Web3 features.');
+    setError(null);
+    const ethereum = getEthereumProvider();
+
+    if (!ethereum) {
+      setError('MetaMask extension is not detected in your browser. Opening MetaMask download page...');
+      if (typeof window !== 'undefined') {
+        window.open('https://metamask.io/download/', '_blank');
+      }
       return;
     }
 
     setIsConnecting(true);
-    setError(null);
 
     try {
-      const _provider = new ethers.BrowserProvider((window as any).ethereum);
-      setProvider(_provider);
-      
-      const accounts = await _provider.send('eth_requestAccounts', []);
-      if (accounts.length > 0) {
+      // Direct EIP-1193 eth_requestAccounts triggers the MetaMask extension popup
+      const accounts: string[] = await ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+
+      if (accounts && accounts.length > 0) {
         setAccount(accounts[0]);
+        const _provider = new ethers.BrowserProvider(ethereum);
+        setProvider(_provider);
+        setError(null);
+      } else {
+        setError('No Ethereum accounts found in MetaMask.');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to connect wallet');
-      console.error(err);
+      console.error('MetaMask connection error:', err);
+      if (err.code === 4001) {
+        setError('Connection request was rejected in MetaMask.');
+      } else if (err.code === -32002) {
+        setError('MetaMask request already pending. Please click the MetaMask extension icon in your browser toolbar.');
+      } else {
+        setError(err.message || 'Failed to connect MetaMask wallet.');
+      }
     } finally {
       setIsConnecting(false);
     }
   };
 
+  const connectDemoWallet = () => {
+    // Allows testing Web3 integration immediately even without MetaMask installed
+    setAccount('0x71C2a84942C0731a66e22F0fb456e45600E45678');
+    setError(null);
+  };
+
   const disconnectWallet = () => {
     setAccount(null);
-    // Note: True disconnection has to happen from MetaMask UI, we just clear local state
+    setError(null);
   };
 
   return (
@@ -95,9 +155,11 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         account,
         provider,
         isConnecting,
+        hasMetaMask,
         connectWallet,
+        connectDemoWallet,
         disconnectWallet,
-        error
+        error,
       }}
     >
       {children}

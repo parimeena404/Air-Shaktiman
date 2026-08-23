@@ -8,7 +8,7 @@ import { Gift, Coins, CheckCircle2, QrCode, ArrowRight, ShieldCheck, Sparkles, X
 
 export const RedeemRewardsView: React.FC = () => {
   const { profile, rewards, redeemPartnerVoucher, setActiveTab } = useEco();
-  const { account, connectWallet, isConnecting } = useWeb3();
+  const { account, connectWallet, connectDemoWallet, disconnectWallet, isConnecting, hasMetaMask, error } = useWeb3();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [confirmReward, setConfirmReward] = useState<{ title: string; business: string; cost: number; discount: number } | null>(null);
@@ -52,7 +52,7 @@ export const RedeemRewardsView: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#07080E]/90 border border-slate-800 text-right space-y-1 font-mono">
+        <div className="p-4 rounded-2xl bg-[#07080E]/90 border border-slate-800 text-right space-y-1 font-mono min-w-[240px]">
           <span className="text-[10px] text-slate-400">YOUR ECO POINTS BALANCE</span>
           <div className="text-3xl font-extrabold text-[#FFC700] flex items-center justify-end gap-2">
             <Coins className="w-6 h-6 text-[#FFC700]" />
@@ -60,20 +60,42 @@ export const RedeemRewardsView: React.FC = () => {
           </div>
           <div className="text-[10px] text-[#03E5B7]">Level: {profile.level} (840 pts to Tier 4)</div>
           
-          <div className="pt-2 mt-2 border-t border-slate-800">
+          <div className="pt-2 mt-2 border-t border-slate-800 space-y-1.5">
             {account ? (
-              <div className="text-[10px] font-bold text-[#03E5B7] flex items-center justify-end gap-1">
-                <Wallet className="w-3 h-3" />
-                {account.substring(0, 6)}...{account.substring(account.length - 4)}
+              <div className="space-y-1">
+                <div className="text-[10px] font-bold text-[#03E5B7] flex items-center justify-end gap-1 bg-[#03E5B7]/10 px-2 py-1 rounded border border-[#03E5B7]/30">
+                  <Wallet className="w-3 h-3" />
+                  {account.substring(0, 6)}...{account.substring(account.length - 4)}
+                </div>
+                <button
+                  onClick={disconnectWallet}
+                  className="text-[9px] text-slate-400 hover:text-red-400 font-mono underline"
+                >
+                  Disconnect Wallet
+                </button>
               </div>
             ) : (
-              <button
-                onClick={connectWallet}
-                disabled={isConnecting}
-                className="w-full py-1.5 bg-[#F6851B]/10 hover:bg-[#F6851B]/20 border border-[#F6851B]/50 text-[#F6851B] text-[10px] font-bold rounded transition-colors disabled:opacity-50"
-              >
-                CONNECT METAMASK
-              </button>
+              <div className="space-y-1">
+                <button
+                  onClick={connectWallet}
+                  disabled={isConnecting}
+                  className="w-full py-1.5 bg-[#F6851B] hover:bg-[#E2761B] text-white text-[10px] font-bold rounded transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Wallet className="w-3.5 h-3.5" />
+                  {isConnecting ? 'Connecting...' : hasMetaMask ? 'CONNECT METAMASK' : 'INSTALL METAMASK'}
+                </button>
+                <button
+                  onClick={connectDemoWallet}
+                  className="text-[9px] text-slate-400 hover:text-[#03E5B7] font-mono underline"
+                >
+                  Use Demo Web3 Wallet
+                </button>
+              </div>
+            )}
+            {error && (
+              <div className="p-1.5 bg-red-950/60 border border-red-800/60 rounded text-[9px] text-red-300 font-mono text-left">
+                ⚠️ {error}
+              </div>
             )}
           </div>
         </div>
