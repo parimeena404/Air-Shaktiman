@@ -325,7 +325,7 @@ export const Sidebar: React.FC = () => {
           >
             #456 PLAYER
           </button>
-          {(profile.role === 'corporate' || profile.role === 'admin') && (
+          {profile.role === 'corporate' && (
             <button
               onClick={() => handleRoleChange('corporate')}
               className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
@@ -336,19 +336,6 @@ export const Sidebar: React.FC = () => {
             >
               <Briefcase className="w-2.5 h-2.5" />
               CSR
-            </button>
-          )}
-          {profile.role === 'admin' && (
-            <button
-              onClick={() => handleRoleChange('admin')}
-              className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
-                role === 'admin'
-                  ? 'bg-[#FF007A] text-white shadow-sm glow-pink'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Shield className="w-2.5 h-2.5" />
-              FRONT MAN
             </button>
           )}
         </div>

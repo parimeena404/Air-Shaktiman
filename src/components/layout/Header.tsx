@@ -21,7 +21,7 @@ import {
 import { MainTab } from '../../types';
 
 export const Header: React.FC = () => {
-  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu, isAuthenticated, openAuthModal, logout } = useEco();
+  const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu, isAuthenticated, openAuthModal, logout, clearAlert, clearAllAlerts } = useEco();
   const [showNotifications, setShowNotifications] = useState(false);
   const [timeString, setTimeString] = useState('');
 
@@ -193,16 +193,24 @@ export const Header: React.FC = () => {
 
       {/* Right: HUD Stats & Time Indicator */}
       <div className="flex items-center gap-3 md:gap-5">
-        {/* Eco Points */}
+        {/* Eco Points / Debarred Admin Status */}
         <div
           onClick={() => setActiveTab('redeem-rewards')}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0D0F17] border border-[#FFC700]/50 hover:border-[#FFC700] cursor-pointer transition-all glow-gold"
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0D0F17] border transition-all ${
+            role === 'admin'
+              ? 'border-red-500/60 bg-red-950/20'
+              : 'border-[#FFC700]/50 hover:border-[#FFC700] glow-gold cursor-pointer'
+          }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#FFC700]" />
+          <Sparkles className={`w-3.5 h-3.5 ${role === 'admin' ? 'text-red-400' : 'text-[#FFC700]'}`} />
           <div className="flex flex-col text-left">
-            <span className="text-[9px] text-slate-400 leading-none font-bold">ECO CASH POOL</span>
-            <span className="text-xs font-black text-[#FFC700] leading-tight">
-              ₹{profile.ecoPoints.toLocaleString()} Pts
+            <span className="text-[9px] text-slate-400 leading-none font-bold">
+              {role === 'admin' ? 'CONTEST STATUS' : 'ECO CASH POOL'}
+            </span>
+            <span className={`text-xs font-black leading-tight ${
+              role === 'admin' ? 'text-red-400 font-mono' : 'text-[#FFC700]'
+            }`}>
+              {role === 'admin' ? 'DEBARRED (0 Pts)' : `₹${profile.ecoPoints.toLocaleString()} Pts`}
             </span>
           </div>
         </div>
@@ -257,39 +265,87 @@ export const Header: React.FC = () => {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-[#09120D] border border-[#00FF66]/40 rounded shadow-2xl p-3 z-50 text-xs font-mono space-y-2">
-              <div className="flex items-center justify-between border-b border-[#12281D] pb-2">
-                <span className="font-bold text-[#00FF66] flex items-center gap-1.5">
-                  <Shield className="w-4 h-4 text-[#00FF66]" /> SYSTEM ALERTS
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#09120D] border border-[#00FF66]/40 rounded-2xl shadow-2xl p-4 z-50 text-xs font-mono space-y-3 animate-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-[#12281D] pb-2.5">
+                <span className="font-bold text-[#00FF66] flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#00FF66]" />
+                  <span>SYSTEM ALERTS</span>
                 </span>
-                <span className="text-[10px] text-[#00FF66]">{alerts.length} ACTIVE</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#00FF66]/10 text-[#00FF66] font-bold border border-[#00FF66]/30">
+                    {alerts.length}/5 RECENT
+                  </span>
+                  {alerts.length > 0 && (
+                    <button
+                      onClick={clearAllAlerts}
+                      className="text-[10px] text-slate-400 hover:text-red-400 transition"
+                      title="Clear all alerts"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1.5 max-h-56 overflow-y-auto">
+
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {alerts.map((alt) => (
-                  <div key={alt.id} className="p-2 rounded bg-[#050B08] border border-[#12281D] space-y-0.5">
-                    <div className="font-bold text-white flex justify-between">
-                      <span>{alt.title}</span>
-                      <span className="text-[9px] text-[#00FF66]">{alt.severity}</span>
+                  <div
+                    key={alt.id}
+                    className="p-2.5 rounded-xl bg-[#050B08] border border-[#12281D] hover:border-[#00FF66]/40 transition-colors space-y-1 relative group"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-white text-xs line-clamp-1">{alt.title}</span>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span
+                          className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
+                            alt.severity === 'Critical'
+                              ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                              : alt.severity === 'Warning'
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                              : 'bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/40'
+                          }`}
+                        >
+                          {alt.severity}
+                        </span>
+                        <button
+                          onClick={() => clearAlert(alt.id)}
+                          className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-opacity p-0.5"
+                          title="Dismiss"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-[10px] text-slate-400">{alt.message}</p>
+                    <p className="text-[11px] text-slate-300 leading-snug">{alt.message}</p>
+                    {alt.timestamp && (
+                      <div className="text-[9px] text-slate-500 text-right">{alt.timestamp}</div>
+                    )}
                   </div>
                 ))}
+                {alerts.length === 0 && (
+                  <div className="text-center py-6 text-slate-500 text-xs">
+                    No active system alerts.
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
-        {/* External Authority & Partner Portal Link */}
-        <a
-          href={process.env.NEXT_PUBLIC_EXTERNAL_PORTAL_URL || 'http://localhost:3001'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded bg-[#1d4ed8]/20 border border-[#38bdf8]/60 text-[#38bdf8] hover:bg-[#1d4ed8]/30 hover:border-[#38bdf8] text-xs font-bold transition-all shadow-[0_0_10px_rgba(56,189,248,0.2)] font-mono"
-          title="Open ECO-SMART Authority & Partner Portal"
-        >
-          <span className="text-sm">🏛️</span>
-          <span>EXTERNAL PORTAL</span>
-        </a>
+        {/* Switch to Admin Button - Admin Accounts Only */}
+        {(profile.role === 'admin' || role === 'admin') && (
+          <button
+            onClick={() => {
+              setRole('admin');
+              setActiveTab('admin');
+            }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/70 text-white hover:bg-[#FF007A] text-xs font-bold transition-all shadow-[0_0_15px_rgba(255,0,122,0.3)] font-mono glow-pink group"
+            title="Switch to Admin Control Suite"
+          >
+            <Shield className="w-3.5 h-3.5 text-[#FF007A] group-hover:text-white transition-colors" />
+            <span className="tracking-wide">SWITCH TO ADMIN</span>
+          </button>
+        )}
 
         {/* Authentication Button */}
         {isAuthenticated ? (

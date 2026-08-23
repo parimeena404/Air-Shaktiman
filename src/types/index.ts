@@ -41,6 +41,7 @@ export type MainTab =
   | 'water'
   | 'waste-analytics'
   // Admin Operations
+  | 'admin'
   | 'admin-overview'
   | 'cleanup-operations'
   | 'material-flow'
@@ -154,6 +155,17 @@ export interface CommunityProject {
   recentActivity: { user: string; action: string; time: string }[];
 }
 
+export interface DailyMission {
+  id: string;
+  type: 'waste-report' | 'recycle' | 'cleanup' | 'surplus-food' | 'civic' | 'social' | 'community-project';
+  text: string;
+  xp: number;
+  points: number;
+  done: boolean;
+  targetTab?: MainTab;
+  dateKey: string;
+}
+
 export interface EcoChallenge {
   id: string;
   title: string;
@@ -226,6 +238,7 @@ export interface AIAlert {
   message: string;
   recommendation: string;
   estimatedSavings: string;
+  timestamp?: string;
 }
 
 export interface ChatMessage {

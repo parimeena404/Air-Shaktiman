@@ -5,7 +5,7 @@ import { useEco } from '../../context/EcoContext';
 import { UserCheck, UserPlus, Edit3, Save, X, Camera, Sparkles } from 'lucide-react';
 
 export const CommunityProfileView: React.FC = () => {
-  const { profile, toggleFollowUser, socialPosts, updateUserProfile, isAuthenticated, openAuthModal } = useEco();
+  const { profile, toggleFollowUser, socialPosts, updateUserProfile, isAuthenticated, openAuthModal, role } = useEco();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(profile.name);
@@ -195,7 +195,9 @@ export const CommunityProfileView: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-[#07080E] border border-slate-800 space-y-1">
           <span className="text-[10px] font-mono text-slate-400">ECO POINTS</span>
-          <div className="text-xl font-extrabold text-[#FFC700] font-mono">{profile.ecoPoints} Pts</div>
+          <div className={`text-xl font-extrabold font-mono ${role === 'admin' ? 'text-red-400 text-sm' : 'text-[#FFC700]'}`}>
+            {role === 'admin' ? '0 Pts (DEBARRED)' : `${profile.ecoPoints} Pts`}
+          </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-[#07080E] border border-slate-800 space-y-1">

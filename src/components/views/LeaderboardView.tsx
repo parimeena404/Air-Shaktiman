@@ -5,7 +5,7 @@ import { useEco } from '../../context/EcoContext';
 import { Award, Trophy, Crown } from 'lucide-react';
 
 export const LeaderboardView: React.FC = () => {
-  const { leaderboard, profile } = useEco();
+  const { leaderboard, profile, role } = useEco();
   const [activeCategory, setActiveCategory] = useState<'Students' | 'Teams' | 'Departments' | 'Hostels'>('Students');
 
   const firstPlace = leaderboard[0];
@@ -14,6 +14,21 @@ export const LeaderboardView: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto font-mono animate-in fade-in duration-300">
+      {/* Admin Debarred Banner */}
+      {role === 'admin' && (
+        <div className="p-3.5 rounded-lg bg-red-950/40 border border-red-500/60 flex items-center justify-between text-xs text-red-300">
+          <div className="flex items-center gap-2">
+            <span className="text-base">🚫</span>
+            <span>
+              <strong>ADMIN DEBARRED STATUS:</strong> As system administrator & host, you are debarred from earning contestant XP or ranking in the citizen leaderboard.
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-bold border border-red-500/40 text-[10px]">
+            HOST AUDITOR
+          </span>
+        </div>
+      )}
+
       {/* Title */}
       <div className="bg-[#0D0F17] border border-[#FF007A]/50 rounded-lg p-5 space-y-2 relative overflow-hidden">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] text-xs font-mono font-bold">

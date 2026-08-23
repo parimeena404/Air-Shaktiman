@@ -24,24 +24,10 @@ import {
 } from 'lucide-react';
 
 export const OverviewView: React.FC = () => {
-  const { profile, wasteReports, setActiveTab } = useEco();
+  const { profile, wasteReports, setActiveTab, dailyMissions, completeDailyMission } = useEco();
 
-  // Daily protocol tasks state simulation
-  const [dailyTasks, setDailyTasks] = useState([
-    { id: 1, text: 'Report one waste item', xp: 50, done: true },
-    { id: 2, text: 'Recycle e-waste', xp: 100, done: true },
-    { id: 3, text: 'Join a cleanup operation', xp: 150, done: false },
-    { id: 4, text: 'Rescue surplus food', xp: 100, done: false },
-  ]);
-
-  const toggleTask = (id: number) => {
-    setDailyTasks(prev =>
-      prev.map(t => (t.id === id ? { ...t, done: !t.done } : t))
-    );
-  };
-
-  const completedCount = dailyTasks.filter(t => t.done).length;
-  const progressPercent = Math.round((completedCount / dailyTasks.length) * 100);
+  const completedCount = dailyMissions.filter((t) => t.done).length;
+  const progressPercent = dailyMissions.length > 0 ? Math.round((completedCount / dailyMissions.length) * 100) : 0;
 
   return (
     <div className="space-y-6 font-mono select-none animate-in fade-in duration-300">
@@ -183,25 +169,44 @@ export const OverviewView: React.FC = () => {
 
           {/* Tasks List */}
           <div className="space-y-2">
-            {dailyTasks.map(task => (
+            {dailyMissions.map((task) => (
               <div
                 key={task.id}
-                onClick={() => toggleTask(task.id)}
-                className={`p-3 rounded bg-[#050B08] border transition-all cursor-pointer flex items-center justify-between text-xs ${
+                className={`p-3 rounded bg-[#050B08] border transition-all flex items-center justify-between text-xs group ${
                   task.done
                     ? 'border-[#12281D] text-slate-500 line-through'
                     : 'border-[#12281D] text-white hover:border-[#00FF66]/50'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div
+                  onClick={() => completeDailyMission(task.id)}
+                  className="flex items-center gap-3 cursor-pointer flex-1"
+                >
                   {task.done ? (
                     <CheckSquare className="w-4 h-4 text-[#00FF66] flex-shrink-0" />
                   ) : (
-                    <Square className="w-4 h-4 text-[#527A67] flex-shrink-0" />
+                    <Square className="w-4 h-4 text-[#527A67] group-hover:text-[#00FF66] flex-shrink-0 transition-colors" />
                   )}
-                  <span>{task.text}</span>
+                  <span className={task.done ? 'line-through text-slate-500' : 'text-slate-100 font-bold'}>
+                    {task.text}
+                  </span>
                 </div>
-                <span className="text-[10px] text-[#F5C518] font-bold">+{task.xp} XP</span>
+
+                <div className="flex items-center gap-3">
+                  {!task.done && task.targetTab && (
+                    <button
+                      onClick={() => setActiveTab(task.targetTab!)}
+                      className="px-2 py-0.5 rounded bg-[#00FF66]/10 hover:bg-[#00FF66]/25 text-[#00FF66] text-[10px] font-bold border border-[#00FF66]/30 transition-all flex items-center gap-1"
+                      title={`Go to ${task.targetTab}`}
+                    >
+                      <span>GO</span>
+                      <ArrowRight className="w-2.5 h-2.5" />
+                    </button>
+                  )}
+                  <span className={`text-[10px] font-bold ${task.done ? 'text-slate-600 line-through' : 'text-[#F5C518]'}`}>
+                    +{task.xp} XP
+                  </span>
+                </div>
               </div>
             ))}
           </div>

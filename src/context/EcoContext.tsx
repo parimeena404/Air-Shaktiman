@@ -34,6 +34,7 @@ import {
   CsrProject,
   CsrReport,
   UserActivityLogItem,
+  DailyMission,
 } from '../types';
 import {
   initialUserProfile,
@@ -118,6 +119,9 @@ interface EcoContextType {
   csrMissions: CsrMission[];
   csrProjects: CsrProject[];
   csrReports: CsrReport[];
+  dailyMissions: DailyMission[];
+  completeDailyMission: (missionId: string) => void;
+  completeMissionByType: (type: DailyMission['type']) => void;
 
   // Core Actions
   reportWaste: (report: Partial<WasteReport>) => void;
@@ -132,6 +136,9 @@ interface EcoContextType {
   sendChatMessage: (text: string) => void;
   removeToast: (id: string) => void;
   addToast: (msg: string, type?: 'success' | 'info' | 'warning') => void;
+  addSystemAlert: (title: string, message: string, severity?: 'Critical' | 'Warning' | 'Info') => void;
+  clearAlert: (id: string) => void;
+  clearAllAlerts: () => void;
 
   // Add-On Actions
   reserveSurplusFood: (foodId: string) => void;
@@ -169,19 +176,81 @@ interface EcoContextType {
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
   uploadImageToCloudinary: (fileOrBase64: File | string) => Promise<string>;
   addEcoPoints: (amount: number, reason?: string) => Promise<void>;
-  userActivityLog: UserActivityLogItem[];
-  logUserActivity: (item: Omit<UserActivityLogItem, 'id' | 'timestamp'>) => void;
+  userActivityLog: any[];
+  logUserActivity: (item: any) => void;
+  // Admin Data Deletion & Purging Actions
+  deleteWasteReport: (id: string) => void;
+  deleteCivicReport: (id: string) => void;
+  deleteMarketItem: (id: string) => void;
+  deleteSurplusFoodListing: (id: string) => void;
+  deleteCommunityProject: (id: string) => void;
+  deleteSocialPost: (id: string) => void;
+  deleteIndustryDemand: (id: string) => void;
+  deleteCleanupOperation: (id: string) => void;
+  deleteActivityFeedItem: (id: string) => void;
+  purgeSectionData: (sectionKey: string) => void;
 }
 
 const EcoContext = createContext<EcoContextType | undefined>(undefined);
 
-export const computeLevelFromPoints = (points: number = 0): string => {
+export const computeLevelFromPoints = (points: number = 0, userRole?: string): string => {
+  if (userRole === 'admin') return 'Debarred Contestant (Apex Admin / Host)';
   if (points >= 2500) return 'Grandmaster Guardian (Tier 5)';
   if (points >= 1000) return 'Eco Champion (Tier 4)';
   if (points >= 500) return 'Eco Vanguard (Tier 3)';
   if (points >= 100) return 'Eco Survivor (Tier 2)';
   return 'Rookie Contestant (Tier 1)';
 };
+
+export const getTodayKey = () => {
+  if (typeof window !== 'undefined') {
+    return new Date().toISOString().split('T')[0];
+  }
+  return '2026-08-23';
+};
+
+export const getDefaultDailyMissions = (dateStr: string): DailyMission[] => [
+  {
+    id: `mission-waste-${dateStr}`,
+    type: 'waste-report',
+    text: 'Report one waste item',
+    xp: 50,
+    points: 50,
+    done: false,
+    targetTab: 'report-waste',
+    dateKey: dateStr,
+  },
+  {
+    id: `mission-recycle-${dateStr}`,
+    type: 'recycle',
+    text: 'Recycle e-waste / List on Market',
+    xp: 100,
+    points: 100,
+    done: false,
+    targetTab: 'market',
+    dateKey: dateStr,
+  },
+  {
+    id: `mission-cleanup-${dateStr}`,
+    type: 'cleanup',
+    text: 'Join a cleanup operation',
+    xp: 150,
+    points: 150,
+    done: false,
+    targetTab: 'challenges',
+    dateKey: dateStr,
+  },
+  {
+    id: `mission-food-${dateStr}`,
+    type: 'surplus-food',
+    text: 'Rescue surplus food',
+    xp: 100,
+    points: 100,
+    done: false,
+    targetTab: 'ecofood',
+    dateKey: dateStr,
+  },
+];
 
 export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -287,9 +356,11 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ) => {
     setProfileState((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
+      const isAdmin = role === 'admin' || next.role === 'admin';
       const updated = {
         ...next,
-        level: computeLevelFromPoints(next.ecoPoints ?? 0),
+        ecoPoints: isAdmin ? 0 : (next.ecoPoints ?? 0),
+        level: isAdmin ? 'Debarred Contestant (Apex Admin / Host)' : computeLevelFromPoints(next.ecoPoints ?? 0, next.role),
       };
       if (typeof window !== 'undefined') {
         localStorage.setItem('ecoverse_profile', JSON.stringify(updated));
@@ -308,7 +379,20 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [rewards, setRewards] = useState<RewardItem[]>(initialRewardItems);
   const [leaderboard] = useState<LeaderboardUser[]>(initialLeaderboard);
   const [telemetry] = useState<CampusTelemetry>(initialCampusTelemetry);
-  const [alerts] = useState<AIAlert[]>(initialAiAlerts);
+  const [alerts, setAlerts] = useState<AIAlert[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('ecoverse_system_alerts');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.slice(0, 5);
+          }
+        }
+      } catch (e) {}
+    }
+    return initialAiAlerts.slice(0, 5);
+  });
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Features State Providers
@@ -333,6 +417,73 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [csrMissions, setCsrMissions] = useState<CsrMission[]>(initialCsrMissions);
   const [csrProjects, setCsrProjects] = useState<CsrProject[]>(initialCsrProjects);
   const [csrReports, setCsrReports] = useState<CsrReport[]>(initialCsrReports);
+
+  // Daily Missions State Provider with Daily Rotation
+  const [dailyMissions, setDailyMissions] = useState<DailyMission[]>(() => {
+    const today = getTodayKey();
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(`ecoverse_daily_missions_${today}`);
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {}
+    }
+    return getDefaultDailyMissions(today);
+  });
+
+  const completeMissionByType = (type: DailyMission['type']) => {
+    const today = getTodayKey();
+    setDailyMissions((prev) => {
+      let found = false;
+      const next = prev.map((m) => {
+        if (!found && m.type === type && !m.done) {
+          found = true;
+          if (role !== 'admin') {
+            setProfile((p) => ({
+              ...p,
+              ecoPoints: p.ecoPoints + (m.points || 50),
+              sustainabilityScore: p.sustainabilityScore + (m.xp || 50),
+            }));
+          }
+          addToast(`⚡ Daily Protocol Completed: "${m.text}"! +${m.xp} XP & +${m.points} Pts awarded!`, 'success');
+          return { ...m, done: true };
+        }
+        return m;
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`ecoverse_daily_missions_${today}`, JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+
+  const completeDailyMission = (missionId: string) => {
+    const today = getTodayKey();
+    setDailyMissions((prev) => {
+      const next = prev.map((m) => {
+        if (m.id === missionId) {
+          const nextDone = !m.done;
+          if (nextDone && role !== 'admin') {
+            setProfile((p) => ({
+              ...p,
+              ecoPoints: p.ecoPoints + (m.points || 50),
+              sustainabilityScore: p.sustainabilityScore + (m.xp || 50),
+            }));
+            addToast(`⚡ Daily Protocol Completed: "${m.text}"! +${m.xp} XP & +${m.points} Pts awarded!`, 'success');
+          }
+          return { ...m, done: nextDone };
+        }
+        return m;
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`ecoverse_daily_missions_${today}`, JSON.stringify(next));
+      }
+      return next;
+    });
+  };
 
   // Fetch initial backend data for live collections and merge with dummy items
   useEffect(() => {
@@ -574,22 +725,22 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (typeof window !== 'undefined') {
         localStorage.setItem('ecoverse_token', adminToken);
       }
+      setRole('admin');
       setProfile((prev) => ({
         ...prev,
         name: 'Thakre (Admin)',
         playerNumber: '#001',
-        ecoPoints: Math.max(prev.ecoPoints || 0, 50000),
-        sustainabilityScore: 999,
+        ecoPoints: 0,
+        sustainabilityScore: 0,
         wasteRecoveredKg: 8500,
         co2SavedKg: 6400,
         communityContributions: 120,
         followersCount: 456,
         followingCount: 12,
-        level: 'Grandmaster Guardian (Tier 5)',
+        level: 'Debarred Contestant (Apex Admin / Host)',
         role: 'admin',
       }));
-      setRole('admin');
-      addToast('Super Admin Access Granted: Welcome Thakre!', 'success');
+      addToast('Super Admin Access Granted: Welcome Thakre (Debarred from Contest Points)', 'info');
       return;
     }
 
@@ -763,9 +914,72 @@ Options available:
     },
   ]);
 
+  const addSystemAlert = (
+    title: string,
+    message: string,
+    severity: 'Critical' | 'Warning' | 'Info' = 'Info'
+  ) => {
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newAlert: AIAlert = {
+      id: 'alert-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      title,
+      type: 'Waste',
+      severity,
+      message,
+      recommendation: 'Track live status in HUD',
+      estimatedSavings: 'Active',
+      timestamp: timeStr,
+    };
+
+    setAlerts((prev) => {
+      // Max 5 recent notifications - automatically remove oldest if > 5!
+      const updated = [newAlert, ...prev].slice(0, 5);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('ecoverse_system_alerts', JSON.stringify(updated));
+        } catch (e) {}
+      }
+      return updated;
+    });
+  };
+
+  const clearAlert = (id: string) => {
+    setAlerts((prev) => {
+      const updated = prev.filter((a) => a.id !== id);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('ecoverse_system_alerts', JSON.stringify(updated));
+        } catch (e) {}
+      }
+      return updated;
+    });
+  };
+
+  const clearAllAlerts = () => {
+    setAlerts([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('ecoverse_system_alerts');
+      } catch (e) {}
+    }
+  };
+
   const addToast = (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
     const id = 'toast-' + Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
+
+    // Automatically sync every action/points notification into System Alerts (Max 5 items)
+    let alertTitle = '✨ Points & Protocol Update';
+    if (message.includes('Report') || message.includes('Waste')) alertTitle = '♻️ Waste Report Logged';
+    else if (message.includes('Market')) alertTitle = '🛍️ EcoMarket Transaction';
+    else if (message.includes('Meal') || message.includes('Food')) alertTitle = '🍱 Food Rescue Alert';
+    else if (message.includes('Challenge') || message.includes('Cleanup')) alertTitle = '🧹 Field Operation Active';
+    else if (message.includes('Daily Protocol') || message.includes('Mission')) alertTitle = '🎯 Daily Mission Complete';
+    else if (type === 'warning') alertTitle = '⚠️ System Alert';
+    else if (type === 'info') alertTitle = 'ℹ️ Eco Update';
+
+    addSystemAlert(alertTitle, message, type === 'warning' ? 'Warning' : 'Info');
+
     setTimeout(() => {
       removeToast(id);
     }, 4000);
@@ -840,6 +1054,7 @@ Options available:
       icon: '♻',
     });
 
+    completeMissionByType('waste-report');
     addToast('📍 Waste Report submitted! +10 Eco Points & +5 XP added', 'success');
   };
 
@@ -940,6 +1155,7 @@ Options available:
       icon: '🛍️',
     });
 
+    completeMissionByType('recycle');
     addToast('🛒 Published to EcoMarket! +50 Eco Points credited.', 'success');
   };
 
@@ -1014,6 +1230,7 @@ Options available:
       icon: '🏬',
     });
 
+    completeMissionByType('recycle');
     addToast(`⚡ Material offer dispatched! Token ${tokenCode} issued (+${pointsAwarded} Pts, est payout ₹${totalEarnedInr})`, 'success');
 
     return {
@@ -1148,6 +1365,7 @@ Options available:
     setChallenges((prev) =>
       prev.map((c) => (c.id === challengeId ? { ...c, isJoined: true, participantsCount: c.participantsCount + 1 } : c))
     );
+    completeMissionByType('cleanup');
     addToast('🏆 Registered for the Arena Challenge!', 'success');
   };
 
@@ -1245,6 +1463,7 @@ Options available:
       icon: '🍱',
     });
 
+    completeMissionByType('surplus-food');
     addToast('🍱 Meal reserved on EcoFood! +10 Eco Points credited.', 'success');
   };
 
@@ -1382,6 +1601,7 @@ Options available:
     setCleanupOperations((prev) =>
       prev.map((op) => (op.id === operationId ? { ...op, assignedTeam: teamName, status: 'Assigned' } : op))
     );
+    completeMissionByType('cleanup');
     addToast(`🧹 Operation ${operationId} assigned to team "${teamName}".`, 'success');
   };
 
@@ -1687,6 +1907,135 @@ Options available:
     addToast('🎯 CSR Mission Joined! +300 Eco Points & +500 XP registered to active profile.', 'success');
   };
 
+  // Admin Data Deletion & Purging Implementations
+  const deleteWasteReport = async (id: string) => {
+    setWasteReports((prev) => prev.filter((r) => r.id !== id && (r as any)._id !== id));
+    if (token) {
+      fetch(`${API_URL}/reports/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    addToast('Admin: Waste report permanently deleted.', 'warning');
+  };
+
+  const deleteCivicReport = async (id: string) => {
+    setCivicReports((prev) => prev.filter((r) => r.id !== id && (r as any)._id !== id));
+    if (token) {
+      fetch(`${API_URL}/civic-reports/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    addToast('Admin: Civic issue ticket removed.', 'warning');
+  };
+
+  const deleteMarketItem = async (id: string) => {
+    setMarketItems((prev) => prev.filter((m) => m.id !== id));
+    if (token) {
+      fetch(`${API_URL}/marketplace/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    addToast('Admin: Marketplace listing removed.', 'warning');
+  };
+
+  const deleteSurplusFoodListing = async (id: string) => {
+    setSurplusFoodListings((prev) => prev.filter((f) => f.id !== id));
+    if (token) {
+      fetch(`${API_URL}/food/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    addToast('Admin: Surplus food listing removed.', 'warning');
+  };
+
+  const deleteCommunityProject = (id: string) => {
+    setCommunityProjects((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_community_projects', JSON.stringify(next));
+      }
+      return next;
+    });
+    addToast('Admin: Community project removed.', 'warning');
+  };
+
+  const deleteSocialPost = async (id: string) => {
+    setSocialPosts((prev) => prev.filter((p) => p.id !== id && (p as any)._id !== id));
+    if (token) {
+      fetch(`${API_URL}/posts/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
+    addToast('Admin: Social post deleted from feed.', 'warning');
+  };
+
+  const deleteIndustryDemand = (id: string) => {
+    setIndustryDemands((prev) => {
+      const next = prev.filter((d) => d.id !== id);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecoverse_industry_demands', JSON.stringify(next));
+      }
+      return next;
+    });
+    addToast('Admin: Industry demand removed.', 'warning');
+  };
+
+  const deleteCleanupOperation = (id: string) => {
+    setCleanupOperations((prev) => prev.filter((c) => c.id !== id));
+    addToast('Admin: Cleanup dispatch operation removed.', 'warning');
+  };
+
+  const deleteActivityFeedItem = (id: string) => {
+    setActivityFeed((prev) => prev.filter((a) => a.id !== id));
+    addToast('Admin: Activity log removed.', 'info');
+  };
+
+  const purgeSectionData = (sectionKey: string) => {
+    switch (sectionKey) {
+      case 'waste-reports':
+        setWasteReports([]);
+        addToast('Admin: All Waste Reports purged.', 'warning');
+        break;
+      case 'civic-reports':
+        setCivicReports([]);
+        addToast('Admin: All Civic Reports purged.', 'warning');
+        break;
+      case 'market-items':
+        setMarketItems([]);
+        addToast('Admin: All Marketplace Listings purged.', 'warning');
+        break;
+      case 'surplus-food':
+        setSurplusFoodListings([]);
+        addToast('Admin: All Surplus Food Listings purged.', 'warning');
+        break;
+      case 'community-projects':
+        setCommunityProjects([]);
+        if (typeof window !== 'undefined') localStorage.removeItem('ecoverse_community_projects');
+        addToast('Admin: All Community Projects purged.', 'warning');
+        break;
+      case 'social-posts':
+        setSocialPosts([]);
+        addToast('Admin: All Social Posts purged.', 'warning');
+        break;
+      case 'industry-demands':
+        setIndustryDemands([]);
+        if (typeof window !== 'undefined') localStorage.removeItem('ecoverse_industry_demands');
+        addToast('Admin: All Industry Demands purged.', 'warning');
+        break;
+      case 'activity-feed':
+        setActivityFeed([]);
+        addToast('Admin: All Activity Logs purged.', 'warning');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <EcoContext.Provider
       value={{
@@ -1728,6 +2077,9 @@ Options available:
         csrMissions,
         csrProjects,
         csrReports,
+        dailyMissions,
+        completeDailyMission,
+        completeMissionByType,
         reportWaste,
         verifyWasteReport,
         listMarketItem,
@@ -1740,6 +2092,9 @@ Options available:
         sendChatMessage,
         removeToast,
         addToast,
+        addSystemAlert,
+        clearAlert,
+        clearAllAlerts,
         reserveSurplusFood,
         listSurplusFood,
         offerFoodToNGO,
@@ -1771,6 +2126,16 @@ Options available:
         addEcoPoints,
         userActivityLog,
         logUserActivity,
+        deleteWasteReport,
+        deleteCivicReport,
+        deleteMarketItem,
+        deleteSurplusFoodListing,
+        deleteCommunityProject,
+        deleteSocialPost,
+        deleteIndustryDemand,
+        deleteCleanupOperation,
+        deleteActivityFeedItem,
+        purgeSectionData,
       }}
     >
       {children}
