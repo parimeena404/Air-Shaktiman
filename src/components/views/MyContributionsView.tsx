@@ -5,13 +5,13 @@ import { useEco } from '../../context/EcoContext';
 import { History, Coins, Recycle, Trash2, Sparkles, MapPin, Camera, Plus, ArrowRight } from 'lucide-react';
 
 export const MyContributionsView: React.FC = () => {
-  const { userActivityLog, profile, setActiveTab } = useEco();
+  const { userActivityLog = [], profile, setActiveTab } = useEco();
   const [filter, setFilter] = useState<'All' | 'Waste Reports' | 'Recycling' | 'Cleanup' | 'Projects' | 'Challenges'>('All');
 
-  const filteredItems = userActivityLog.filter((item) => filter === 'All' || item.type === filter);
+  const filteredItems = (userActivityLog || []).filter((item: any) => filter === 'All' || item.type === filter);
 
   // Calculate actual total points earned across all contributions logged
-  const totalContributionPoints = userActivityLog.reduce((sum, item) => sum + (item.points || 0), 0);
+  const totalContributionPoints = (userActivityLog || []).reduce((sum: number, item: any) => sum + (item.points || 0), 0);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto font-mono select-none animate-in fade-in duration-300">
@@ -124,7 +124,7 @@ export const MyContributionsView: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredItems.map((item) => (
+          {filteredItems.map((item: any) => (
             <div
               key={item.id}
               className="bg-[#0D0F17] border border-[#1D2133] hover:border-[#03E5B7] rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all shadow-lg group"

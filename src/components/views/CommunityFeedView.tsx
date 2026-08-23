@@ -19,10 +19,11 @@ import {
   Utensils,
   X,
   ArrowRight,
+  Trash2,
 } from 'lucide-react';
 
 export const CommunityFeedView: React.FC = () => {
-  const { socialPosts, toggleLikePost, addPostComment, createSocialPost, setActiveTab } = useEco();
+  const { socialPosts, toggleLikePost, addPostComment, createSocialPost, setActiveTab, role, deleteSocialPost } = useEco();
 
   // Create Post Modal State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -223,15 +224,27 @@ export const CommunityFeedView: React.FC = () => {
                   </button>
                 </div>
 
-                <span className="text-slate-500 text-[10px]">{post.sharesCount} Shares</span>
+                <div className="flex items-center gap-3">
+                  {role === 'admin' && (
+                    <button
+                      onClick={() => deleteSocialPost(post.id)}
+                      className="px-2.5 py-1 rounded bg-red-600/20 hover:bg-red-600 border border-red-500/50 text-red-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1"
+                      title="Admin Delete Post"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Delete Post</span>
+                    </button>
+                  )}
+                  <span className="text-slate-500 text-[10px]">{post.sharesCount} Shares</span>
+                </div>
               </div>
 
               {/* Comments Section */}
               {isCommentsOpen && (
                 <div className="pt-3 border-t border-slate-800/80 space-y-3 animate-in fade-in">
                   <div className="space-y-2">
-                    {post.comments.map((c) => (
-                      <div key={c.id} className="p-2.5 rounded-xl bg-[#07080E] border border-slate-800 text-xs space-y-1">
+                    {post.comments.map((c, cIdx) => (
+                      <div key={c.id || `cmt-${cIdx}`} className="p-2.5 rounded-xl bg-[#07080E] border border-slate-800 text-xs space-y-1">
                         <div className="flex justify-between font-mono">
                           <strong className="text-white font-bold">{c.authorName}</strong>
                           <span className="text-[10px] text-slate-500">{c.timestamp}</span>

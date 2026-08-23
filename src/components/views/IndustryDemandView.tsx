@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
 import { IndustryDemand } from '../../types';
-import { Building2, CheckCircle2, MapPin, ArrowRight, ShieldCheck, Zap, X, Coins, QrCode, AlertTriangle } from 'lucide-react';
+import { Building2, CheckCircle2, MapPin, ArrowRight, ShieldCheck, Zap, X, Coins, QrCode, AlertTriangle, Trash2 } from 'lucide-react';
 
 export const IndustryDemandView: React.FC = () => {
-  const { industryDemands, offerMaterialToIndustry, setActiveTab } = useEco();
+  const { industryDemands, offerMaterialToIndustry, setActiveTab, role, deleteIndustryDemand } = useEco();
   const [selectedDemand, setSelectedDemand] = useState<IndustryDemand | null>(null);
   const [quantityKg, setQuantityKg] = useState<number>(25);
   const [offerResult, setOfferResult] = useState<any | null>(null);
@@ -113,18 +113,30 @@ export const IndustryDemandView: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  disabled={isFulfilled}
-                  onClick={() => handleOpenModal(dem)}
-                  className={`px-5 py-3 rounded-xl font-black text-xs flex items-center gap-1.5 transition-all shadow-lg ${
-                    isFulfilled
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                      : 'bg-[#03E5B7] text-[#07080E] glow-teal hover:bg-[#03E5B7]/90'
-                  }`}
-                >
-                  <span>{isFulfilled ? 'Demand Closed' : 'Offer Material'}</span>
-                  {!isFulfilled && <ArrowRight className="w-4 h-4" />}
-                </button>
+                <div className="flex items-center gap-2">
+                  {role === 'admin' && (
+                    <button
+                      onClick={() => deleteIndustryDemand(dem.id)}
+                      className="px-3 py-3 rounded-xl bg-red-600/20 hover:bg-red-600 border border-red-500/50 text-red-400 hover:text-white text-xs font-bold transition flex items-center gap-1"
+                      title="Admin Delete Demand"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                  <button
+                    disabled={isFulfilled}
+                    onClick={() => handleOpenModal(dem)}
+                    className={`px-5 py-3 rounded-xl font-black text-xs flex items-center gap-1.5 transition-all shadow-lg ${
+                      isFulfilled
+                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                        : 'bg-[#03E5B7] text-[#07080E] glow-teal hover:bg-[#03E5B7]/90'
+                    }`}
+                  >
+                    <span>{isFulfilled ? 'Demand Closed' : 'Offer Material'}</span>
+                    {!isFulfilled && <ArrowRight className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
           );

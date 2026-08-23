@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
-import { ShoppingBag, Plus, Search, Filter, MapPin, Tag, ArrowRight, X, Bot, Camera } from 'lucide-react';
+import { ShoppingBag, Plus, Search, Filter, MapPin, Tag, ArrowRight, X, Bot, Camera, Trash2 } from 'lucide-react';
 
 export const EcoMarketView: React.FC = () => {
-  const { marketItems, listMarketItem, setActiveTab, addToast } = useEco();
+  const { marketItems, listMarketItem, setActiveTab, addToast, role, deleteMarketItem } = useEco();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [showListModal, setShowListModal] = useState(false);
@@ -163,12 +163,24 @@ export const EcoMarketView: React.FC = () => {
                   <span className="text-[11px] text-slate-300 font-mono font-bold">{item.sellerName || 'Contestant'}</span>
                 </div>
 
-                <button
-                  onClick={() => addToast(`Contact request sent to ${item.sellerName || 'seller'}!`, 'success')}
-                  className="px-3 py-1.5 rounded bg-[#FF007A] text-white text-xs font-black glow-pink hover:bg-[#FF007A]/90 transition-all"
-                >
-                  Buy / Inquire
-                </button>
+                <div className="flex items-center gap-2">
+                  {role === 'admin' && (
+                    <button
+                      onClick={() => deleteMarketItem(item.id)}
+                      className="px-2.5 py-1.5 rounded bg-red-600/20 hover:bg-red-600 border border-red-500/50 text-red-400 hover:text-white text-xs font-bold transition-all flex items-center gap-1"
+                      title="Admin Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => addToast(`Contact request sent to ${item.sellerName || 'seller'}!`, 'success')}
+                    className="px-3 py-1.5 rounded bg-[#FF007A] text-white text-xs font-black glow-pink hover:bg-[#FF007A]/90 transition-all"
+                  >
+                    Buy / Inquire
+                  </button>
+                </div>
               </div>
             </div>
           </div>

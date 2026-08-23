@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
-import { Utensils, Search, Clock, Tag, MapPin, CheckCircle2, ShieldCheck, Heart } from 'lucide-react';
+import { Utensils, Search, Clock, Tag, MapPin, CheckCircle2, ShieldCheck, Heart, Trash2 } from 'lucide-react';
 
 export const EcoFoodView: React.FC = () => {
-  const { surplusFoodListings, reserveSurplusFood, setActiveTab } = useEco();
+  const { surplusFoodListings, reserveSurplusFood, setActiveTab, role, deleteSurplusFoodListing } = useEco();
   const [selectedCategory, setSelectedCategory] = useState<string>('Nearby');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -142,13 +142,25 @@ export const EcoFoodView: React.FC = () => {
                   {item.availableServings} Available
                 </span>
 
-                <button
-                  onClick={() => reserveSurplusFood(item.id)}
-                  disabled={item.availableServings === 0}
-                  className="px-4 py-2 rounded-xl bg-[#03E5B7] text-[#07080E] font-black text-xs glow-teal hover:bg-[#03E5B7]/90 transition-all disabled:opacity-50"
-                >
-                  {item.availableServings === 0 ? 'Sold Out' : 'Reserve Meal (+10 Pts)'}
-                </button>
+                <div className="flex items-center gap-2">
+                  {role === 'admin' && (
+                    <button
+                      onClick={() => deleteSurplusFoodListing(item.id)}
+                      className="px-2.5 py-2 rounded-xl bg-red-600/20 hover:bg-red-600 border border-red-500/50 text-red-400 hover:text-white text-xs font-bold transition flex items-center gap-1"
+                      title="Admin Delete Listing"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => reserveSurplusFood(item.id)}
+                    disabled={item.availableServings === 0}
+                    className="px-4 py-2 rounded-xl bg-[#03E5B7] text-[#07080E] font-black text-xs glow-teal hover:bg-[#03E5B7]/90 transition-all disabled:opacity-50"
+                  >
+                    {item.availableServings === 0 ? 'Sold Out' : 'Reserve Meal (+10 Pts)'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

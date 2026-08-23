@@ -44,6 +44,7 @@ import { EcoFoodNgoView } from '../components/views/EcoFoodNgoView';
 import { GovernmentConnectView } from '../components/views/GovernmentConnectView';
 import { CivicReportingView } from '../components/views/CivicReportingView';
 import { AdminOverviewView } from '../components/views/AdminOverviewView';
+import { AdminSuiteView } from '../components/views/AdminSuiteView';
 import { CleanupOperationsView } from '../components/views/CleanupOperationsView';
 import { MaterialFlowView } from '../components/views/MaterialFlowView';
 import { UserManagementView } from '../components/views/UserManagementView';
@@ -150,6 +151,8 @@ export default function Home() {
         return <CivicReportingView />;
 
       // Admin Operations
+      case 'admin':
+        return <AdminSuiteView />;
       case 'admin-overview':
         return <AdminOverviewView />;
       case 'cleanup-operations':

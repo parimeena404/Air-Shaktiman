@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
-import { ShieldAlert, Plus, MapPin, CheckCircle2, Download, AlertTriangle, X } from 'lucide-react';
+import { ShieldAlert, Plus, MapPin, CheckCircle2, Download, AlertTriangle, X, Trash2 } from 'lucide-react';
 
 export const CivicReportingView: React.FC = () => {
-  const { civicReports, reportCivicIssue, generateImpactReport } = useEco();
+  const { civicReports, reportCivicIssue, generateImpactReport, role, deleteCivicReport } = useEco();
   const [showModal, setShowModal] = useState(false);
 
   // Form State
@@ -102,6 +102,16 @@ export const CivicReportingView: React.FC = () => {
               >
                 Confirm (+5 Pts)
               </button>
+              {role === 'admin' && (
+                <button
+                  onClick={() => deleteCivicReport(report.id)}
+                  className="px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/50 text-xs font-bold transition flex items-center gap-1"
+                  title="Admin Delete"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+              )}
             </div>
           </div>
         ))}

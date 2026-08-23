@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useEco } from '../../context/EcoContext';
 import { CommunityProject } from '../../types';
-import { Users, Plus, Heart, MessageSquare, Gift, ArrowRight, X, CheckCircle, Sparkles, Target, Package, Layers } from 'lucide-react';
+import { Users, Plus, Heart, MessageSquare, Gift, ArrowRight, X, CheckCircle, Sparkles, Target, Package, Layers, Trash2 } from 'lucide-react';
 
 export const CommunityProjectsView: React.FC = () => {
-  const { communityProjects, joinCommunityProject, createCommunityProject, donateToProject, addToast } = useEco();
+  const { communityProjects, joinCommunityProject, createCommunityProject, donateToProject, addToast, role, deleteCommunityProject } = useEco();
   const [selectedProject, setSelectedProject] = useState<CommunityProject | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
 
@@ -124,12 +124,24 @@ export const CommunityProjectsView: React.FC = () => {
                 </button>
               </div>
 
-              <button
-                onClick={() => setSelectedProject(proj)}
-                className="px-3.5 py-1.5 rounded-lg bg-[#07080E] border border-[#1D2133] text-white text-xs font-black hover:border-[#FF007A] hover:text-[#FF007A] transition-colors"
-              >
-                View Details →
-              </button>
+              <div className="flex items-center gap-2">
+                {role === 'admin' && (
+                  <button
+                    onClick={() => deleteCommunityProject(proj.id)}
+                    className="px-2.5 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600 border border-red-500/50 text-red-400 hover:text-white text-xs font-bold transition flex items-center gap-1"
+                    title="Admin Delete Project"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedProject(proj)}
+                  className="px-3.5 py-1.5 rounded-lg bg-[#07080E] border border-[#1D2133] text-white text-xs font-black hover:border-[#FF007A] hover:text-[#FF007A] transition-colors"
+                >
+                  View Details →
+                </button>
+              </div>
             </div>
           </div>
         ))}
