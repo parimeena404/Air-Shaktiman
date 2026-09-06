@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import { useEco } from '../../context/EcoContext';
 
 import { OverviewView } from '../views/OverviewView';
@@ -51,19 +52,21 @@ import { CsrReportsView } from '../views/csr/CsrReportsView';
 
 export const PortalViewRouter: React.FC = () => {
   const { activeTab, role } = useEco();
+  const pathname = usePathname();
 
-  // If role is set to Corporate Sponsor and overview is selected, show CSR Hub
-  if (role === 'corporate' && activeTab === 'overview') {
+  const isGov = pathname?.startsWith('/government') || role === 'government';
+  const isAdmin = pathname?.startsWith('/organization') || role === 'admin';
+  const isCompany = pathname?.startsWith('/csr') || role === 'corporate';
+
+  if (isCompany && activeTab === 'overview') {
     return <CsrHubView />;
   }
 
-  // If role is set to Admin (Front Man) and overview is selected, show Admin Overview
-  if (role === 'admin' && activeTab === 'overview') {
+  if (isAdmin && activeTab === 'overview') {
     return <AdminOverviewView />;
   }
 
-  // If role is set to Government and overview is selected, show Government Connect
-  if (role === 'government' && activeTab === 'overview') {
+  if (isGov && activeTab === 'overview') {
     return <GovernmentConnectView />;
   }
 
