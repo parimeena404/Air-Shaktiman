@@ -34,6 +34,7 @@ const PORTAL_NAV = [
 export const Header: React.FC = () => {
   const {
     profile,
+    role,
     activeTab,
     setActiveTab,
     setRole,
@@ -53,8 +54,15 @@ export const Header: React.FC = () => {
   const router = useRouter();
   const portalStyle = getPortalStyle(pathname || '');
 
+  const hasPortalAccess = (portalId: string): boolean => {
+    if (portalId === 'user') return true;
+    if (portalId === 'admin') return role === 'admin';
+    if (portalId === 'government') return role === 'government' || role === 'admin';
+    if (portalId === 'company') return role === 'corporate' || role === 'admin';
+    return false;
+  };
+
   const handlePortalSwitch = (p: typeof PORTAL_NAV[number]) => {
-    setRole(p.role);
     setActiveTab('overview');
     router.push(p.path);
   };
@@ -178,6 +186,7 @@ export const Header: React.FC = () => {
               >
                 <span>{p.emoji}</span>
                 <span>{p.label}</span>
+                {!hasPortalAccess(p.id) && <span className="text-[10px] opacity-60">🔒</span>}
               </button>
             );
           })}
@@ -318,6 +327,7 @@ export const Header: React.FC = () => {
             >
               <span>{p.emoji}</span>
               <span>{p.label}</span>
+              {!hasPortalAccess(p.id) && <span className="text-[10px] opacity-60">🔒</span>}
             </button>
           );
         })}

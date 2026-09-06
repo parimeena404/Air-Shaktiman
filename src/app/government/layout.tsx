@@ -3,6 +3,7 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import { Header } from '../../components/layout/Header';
 import { AuthModal } from '../../components/auth/AuthModal';
 import { SquidCyberBackground } from '../../components/layout/SquidCyberBackground';
+import { PortalAuthGuard } from '../../components/auth/PortalAuthGuard';
 
 export default function GovernmentLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +13,16 @@ export default function GovernmentLayout({ children }: { children: React.ReactNo
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
         <Header />
         <main className="flex-1 p-3 sm:p-5 md:p-8 max-w-7xl w-full mx-auto pb-20 md:pb-8">
-          {children}
+          <PortalAuthGuard
+            allowedRoles={['government', 'admin']}
+            portalName="Government Portal"
+            portalEmoji="🏛️"
+            portalColor="#34A853"
+            portalBg="#E6F4EA"
+            demoEmail="gov@airshaktiman.com"
+          >
+            {children}
+          </PortalAuthGuard>
         </main>
       </div>
       <AuthModal />
