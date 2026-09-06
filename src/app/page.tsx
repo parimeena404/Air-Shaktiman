@@ -2,214 +2,192 @@
 
 import React, { useEffect } from 'react';
 import { useEco } from '../context/EcoContext';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Header } from '../components/layout/Header';
-import { AuthModal } from '../components/auth/AuthModal';
-
-import { OverviewView } from '../components/views/OverviewView';
-import { ReportWasteView } from '../components/views/ReportWasteView';
-import { MyContributionsView } from '../components/views/MyContributionsView';
-import { EcoAiCopilot } from '../components/ai/EcoAiCopilot';
-
-// Discover, Nearby Map & Rewards Views
-import { NearbyView } from '../components/views/NearbyView';
-import { RedeemRewardsView } from '../components/views/RedeemRewardsView';
-import { MyRewardsView } from '../components/views/MyRewardsView';
-import { PartnerNetworkView } from '../components/views/PartnerNetworkView';
-
-// Community Social Views
-import { CommunityFeedView } from '../components/views/CommunityFeedView';
-import { CommunityGroupsView } from '../components/views/CommunityGroupsView';
-import { CommunityProfileView } from '../components/views/CommunityProfileView';
-
-// Circular Economy Views
-import { EcoMarketView } from '../components/views/EcoMarketView';
-import { IndustryDemandView } from '../components/views/IndustryDemandView';
-import { MatchingSystemView } from '../components/views/MatchingSystemView';
-import { BuildFromWasteView } from '../components/views/BuildFromWasteView';
-import { CommunityProjectsView } from '../components/views/CommunityProjectsView';
-import { ChallengesView } from '../components/views/ChallengesView';
-import { LeaderboardView } from '../components/views/LeaderboardView';
-import { RewardsView } from '../components/views/RewardsView';
-import { CampusMonitorView } from '../components/views/CampusMonitorView';
-import { EnergyAnalyticsView } from '../components/views/EnergyAnalyticsView';
-import { WaterAnalyticsView } from '../components/views/WaterAnalyticsView';
-import { WasteAnalyticsView } from '../components/views/WasteAnalyticsView';
-import { ImpactDashboardView } from '../components/views/ImpactDashboardView';
-
-// EcoFood, Government, & Admin Views
-import { EcoFoodView } from '../components/views/EcoFoodView';
-import { EcoFoodPartnerView } from '../components/views/EcoFoodPartnerView';
-import { EcoFoodNgoView } from '../components/views/EcoFoodNgoView';
-import { GovernmentConnectView } from '../components/views/GovernmentConnectView';
-import { CivicReportingView } from '../components/views/CivicReportingView';
-import { AdminOverviewView } from '../components/views/AdminOverviewView';
-import { AdminSuiteView } from '../components/views/AdminSuiteView';
-import { CleanupOperationsView } from '../components/views/CleanupOperationsView';
-import { MaterialFlowView } from '../components/views/MaterialFlowView';
-import { UserManagementView } from '../components/views/UserManagementView';
-import { ShinchanCollector } from '../components/game/ShinchanCollector';
-import { SquidCyberBackground } from '../components/layout/SquidCyberBackground';
-
-// Corporate Impact Arena (CSR) Views
-import { CsrHubView } from '../components/views/csr/CsrHubView';
-import { CsrMissionsView } from '../components/views/csr/CsrMissionsView';
-import { CsrProjectsView } from '../components/views/csr/CsrProjectsView';
-import { CsrFundingView } from '../components/views/csr/CsrFundingView';
-import { CsrImpactDashboardView } from '../components/views/csr/CsrImpactDashboardView';
-import { CsrLeaderboardView } from '../components/views/csr/CsrLeaderboardView';
-import { CsrReportsView } from '../components/views/csr/CsrReportsView';
 import { AuthGateView } from '../components/auth/AuthGateView';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { isAuthenticated, token, role } = useEco();
+  const { isAuthenticated, token, role, profile } = useEco();
   const router = useRouter();
 
-  useEffect(() => {
-    if (isAuthenticated || token) {
-      if (role === 'admin') {
-        router.push('/organization');
-      } else if (role === 'corporate') {
-        router.push('/csr');
-      } else if (role === 'government') {
-        router.push('/government');
-      } else {
-        router.push('/user');
-      }
-    }
-  }, [isAuthenticated, token, role, router]);
-
+  // If not logged in, show auth
   if (!isAuthenticated && !token) {
     return <AuthGateView />;
   }
 
-  // Loading state while redirecting
-  const renderActiveView = () => {
-    // If role is set to Corporate Sponsor and overview is selected, show CSR Hub
-    if (role === 'corporate' && activeTab === 'overview') {
-      return <CsrHubView />;
-    }
+  // Portal cards for logged-in users
+  const portals = [
+    {
+      id: 'user',
+      title: 'User Portal',
+      subtitle: 'Community, complaints, coupons & contributions',
+      emoji: '👤',
+      color: '#4285F4',
+      bgGradient: 'linear-gradient(135deg, #4285F4 0%, #1A73E8 100%)',
+      lightBg: '#E8F0FE',
+      route: '/user',
+      features: ['Community Page', 'Complain & Report', 'Coupons & Rewards', 'My Contributions', 'Events & Profile', 'AI Chatbot'],
+      available: true,
+    },
+    {
+      id: 'admin',
+      title: 'Admin Portal',
+      subtitle: 'Monitor zones, manage reports & AI decisions',
+      emoji: '🛡️',
+      color: '#EA4335',
+      bgGradient: 'linear-gradient(135deg, #EA4335 0%, #D93025 100%)',
+      lightBg: '#FCE8E6',
+      route: '/organization',
+      features: ['User Tasks', 'Report Review', 'AI Decision Helper', 'Pollution Index', 'Zone Maps', 'Leaderboard'],
+      available: profile.role === 'admin',
+    },
+    {
+      id: 'company',
+      title: 'Company Portal',
+      subtitle: 'CSR ranking, funding & impact tracking',
+      emoji: '🏢',
+      color: '#FBBC04',
+      bgGradient: 'linear-gradient(135deg, #FBBC04 0%, #E37400 100%)',
+      lightBg: '#FEF7E0',
+      route: '/csr',
+      features: ['Company Profile', 'Points & Coupons', 'CSR Rank', 'Admin Check'],
+      available: profile.role === 'corporate' || profile.role === 'admin',
+    },
+    {
+      id: 'government',
+      title: 'Government Portal',
+      subtitle: 'Civic management, environment & operations',
+      emoji: '🏛️',
+      color: '#34A853',
+      bgGradient: 'linear-gradient(135deg, #34A853 0%, #137333 100%)',
+      lightBg: '#E6F4EA',
+      route: '/government',
+      features: ['Civic Issues', 'Pollution Monitor', 'Zone Maps', 'Cleanup Ops'],
+      available: profile.role === 'government' || profile.role === 'admin',
+    },
+  ];
 
-    // If role is set to Admin (Front Man) and overview is selected, show Admin Overview
-    if (role === 'admin' && activeTab === 'overview') {
-      return <AdminOverviewView />;
-    }
-
-    switch (activeTab) {
-      case 'overview':
-        return <OverviewView />;
-      case 'report-waste':
-        return <ReportWasteView />;
-      case 'contributions':
-        return <MyContributionsView />;
-      case 'eco-ai':
-        return <EcoAiCopilot />;
-
-      // Corporate Impact Arena (CSR)
-      case 'csr-hub':
-        return <CsrHubView />;
-      case 'csr-missions':
-        return <CsrMissionsView />;
-      case 'csr-projects':
-        return <CsrProjectsView />;
-      case 'csr-funding':
-        return <CsrFundingView />;
-      case 'csr-impact':
-        return <CsrImpactDashboardView />;
-      case 'csr-leaderboard':
-        return <CsrLeaderboardView />;
-      case 'csr-reports':
-        return <CsrReportsView />;
-
-      // Discover, Nearby Map & Rewards
-      case 'nearby':
-        return <NearbyView />;
-      case 'redeem-rewards':
-        return <RedeemRewardsView />;
-      case 'my-rewards':
-        return <MyRewardsView />;
-      case 'partner-network':
-        return <PartnerNetworkView />;
-
-      // Community Social
-      case 'community-feed':
-        return <CommunityFeedView />;
-      case 'community-groups':
-      case 'community-events':
-        return <CommunityGroupsView />;
-      case 'community-profile':
-        return <CommunityProfileView />;
-
-      // Circular Economy
-      case 'market':
-        return <EcoMarketView />;
-      case 'industry-demand':
-        return <IndustryDemandView />;
-      case 'matching':
-        return <MatchingSystemView />;
-      case 'reuse-ideas':
-        return <BuildFromWasteView />;
-      case 'community-projects':
-        return <CommunityProjectsView />;
-
-      // EcoFood Surplus Network
-      case 'ecofood':
-        return <EcoFoodView />;
-      case 'ecofood-partner':
-        return <EcoFoodPartnerView />;
-      case 'ecofood-ngo':
-        return <EcoFoodNgoView />;
-
-      // Government & Civic
-      case 'government-connect':
-        return <GovernmentConnectView />;
-      case 'civic-reporting':
-        return <CivicReportingView />;
-
-      // Admin Operations
-      case 'admin':
-        return <AdminSuiteView />;
-      case 'admin-overview':
-        return <AdminOverviewView />;
-      case 'cleanup-operations':
-        return <CleanupOperationsView />;
-      case 'material-flow':
-        return <MaterialFlowView />;
-      case 'user-management':
-        return <UserManagementView />;
-
-      // Arena & Rewards
-      case 'challenges':
-        return <ChallengesView />;
-      case 'leaderboard':
-        return <LeaderboardView />;
-      case 'rewards':
-        return <RewardsView />;
-
-      // Campus Intelligence
-      case 'campus-monitor':
-        return <CampusMonitorView />;
-      case 'energy':
-        return <EnergyAnalyticsView />;
-      case 'water':
-        return <WaterAnalyticsView />;
-      case 'waste-analytics':
-        return <WasteAnalyticsView />;
-      case 'impact-dashboard':
-        return <ImpactDashboardView />;
-
-      default:
-        return <OverviewView />;
-    }
-  };
+  // Filter to show available portals first, then locked
+  const availablePortals = portals.filter(p => p.available);
+  const lockedPortals = portals.filter(p => !p.available);
 
   return (
-    <div className="flex min-h-screen relative items-center justify-center" style={{ backgroundColor: '#F8F9FA' }}>
-      <SquidCyberBackground />
-      <div className="relative z-10 flex flex-col items-center">
-        <span className="inline-block w-10 h-10 border-3 rounded-full animate-spin mb-4" style={{ borderColor: '#E8EAED', borderTopColor: '#4285F4' }} />
-        <h2 className="text-sm font-semibold tracking-wide" style={{ color: '#5F6368' }}>Redirecting to dashboard...</h2>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F9FA' }}>
+      {/* Header */}
+      <header className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E8EAED' }}>
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#4285F4' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#EA4335' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#FBBC04' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#34A853' }} />
+          </div>
+          <h1 className="font-bold text-lg" style={{ color: '#202124' }}>Air Shaktiman</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              style={{ backgroundColor: '#4285F4' }}>
+              {profile.name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <span className="text-sm font-medium hidden sm:inline" style={{ color: '#202124' }}>{profile.name}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 pb-6">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: '#202124' }}>
+            Welcome back, {profile.name?.split(' ')[0] || 'User'} 👋
+          </h2>
+          <p className="text-base" style={{ color: '#5F6368' }}>
+            Choose a portal to get started. Each portal is designed for a specific role.
+          </p>
+        </div>
+
+        {/* Available Portals */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+          {availablePortals.map((portal) => (
+            <button
+              key={portal.id}
+              onClick={() => {
+                // Set role before navigating
+                if (portal.id === 'admin') {
+                  router.push('/organization');
+                } else if (portal.id === 'company') {
+                  router.push('/csr');
+                } else if (portal.id === 'government') {
+                  router.push('/government');
+                } else {
+                  router.push('/user');
+                }
+              }}
+              className="text-left rounded-2xl overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.99]"
+              style={{ boxShadow: '0 2px 12px rgba(60, 64, 67, 0.12)', border: '1px solid #E8EAED' }}
+            >
+              {/* Color banner */}
+              <div className="h-2" style={{ background: portal.bgGradient }} />
+              <div className="p-5 bg-white">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      style={{ backgroundColor: portal.lightBg }}>
+                      {portal.emoji}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg" style={{ color: '#202124' }}>{portal.title}</h3>
+                      <p className="text-xs" style={{ color: '#5F6368' }}>{portal.subtitle}</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 mt-1" style={{ color: portal.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+                {/* Feature pills */}
+                <div className="flex flex-wrap gap-1.5">
+                  {portal.features.map((f, i) => (
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                      style={{ backgroundColor: portal.lightBg, color: portal.color }}>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Locked Portals */}
+        {lockedPortals.length > 0 && (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px flex-1" style={{ backgroundColor: '#E8EAED' }} />
+              <span className="text-xs font-semibold" style={{ color: '#80868B' }}>OTHER PORTALS</span>
+              <div className="h-px flex-1" style={{ backgroundColor: '#E8EAED' }} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {lockedPortals.map((portal) => (
+                <div
+                  key={portal.id}
+                  className="rounded-xl p-4 opacity-50 cursor-not-allowed"
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8EAED' }}
+                >
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <span className="text-xl">{portal.emoji}</span>
+                    <div>
+                      <h4 className="font-semibold text-sm" style={{ color: '#202124' }}>{portal.title}</h4>
+                      <p className="text-[10px]" style={{ color: '#80868B' }}>Requires {portal.id} role</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                    style={{ backgroundColor: '#F1F3F4', color: '#80868B' }}>
+                    🔒 Locked
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
