@@ -74,26 +74,30 @@ export const AdminOverviewView: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-300 font-sans select-none">
-      {/* Title & Front Man Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-50 p-6 rounded-2xl border border-[#1e3a8a]/50 shadow-sm">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f97316] text-gray-900 text-xs font-bold mb-2 shadow-md">
+      {/* Title & Apex Admin Header with Cloud Team photo */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="flex-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 text-xs font-bold mb-2">
             <Shield className="w-3.5 h-3.5" />
-            <span>◯ △ □ FRONT MAN // APEX ADMIN CONTROL</span>
+            <span>GOOGLE CLOUD & APEX ADMIN CONTROL</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-wide">
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
             Master Data Moderation & Purge Center
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Full administrative privilege to view, delete, or purge user-submitted data across all sidebar sections.
+          <p className="text-xs text-gray-500 mt-1 max-w-xl">
+            Full administrative privilege to review citizen submissions, inspect cloud analytics, and manage platform operations.
           </p>
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+            <span>Admin Active: Authorized System Controller</span>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2 text-xs">
-          <span className="px-3 py-1.5 rounded-lg bg-white border border-[#00FF66]/50 text-green-600 font-bold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#00FF66] animate-ping" />
-            <span>Admin Active: Thakre (Debarred 0 Pts)</span>
-          </span>
+        <div className="flex-shrink-0">
+          <img
+            src="/images/google-cloud-team.jpg"
+            alt="Google Cloud Team Operations"
+            className="max-h-36 w-auto object-contain rounded-xl shadow-sm hover:scale-105 transition-transform"
+          />
         </div>
       </div>
 

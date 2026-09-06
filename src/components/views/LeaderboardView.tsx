@@ -29,28 +29,39 @@ export const LeaderboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Title */}
-      <div className="bg-[#0D0F17] border border-[#FF007A]/50 rounded-lg p-5 space-y-2 relative overflow-hidden">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] text-xs font-mono font-bold">
-          <Award className="w-3.5 h-3.5" />
-          <span>SQUID ARENA RANKING LADDER // ROUND 7</span>
+      {/* GDG Community Hackathon & Impact Leaderboard Banner */}
+      <div className="bg-white border border-[#E8EAED] rounded-2xl p-6 relative overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="relative z-10 flex-1 space-y-3 font-sans">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6F4EA] text-[#137333] text-xs font-bold">
+            <Trophy className="w-3.5 h-3.5 text-[#34A853]" />
+            <span>GDG CLEAN-TECH HACKATHON LEADERBOARD</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#202124] tracking-tight">
+            Campus & Zone Champions
+          </h1>
+          <p className="text-xs md:text-sm text-[#5F6368] max-w-xl">
+            Live rankings of student innovators, developer teams, and campus clubs competing to divert waste, build circular prototypes, and top the leaderboard.
+          </p>
         </div>
-        <h1 className="text-2xl font-black text-white tracking-widest">SQUID GAME LEADERBOARD</h1>
-        <p className="text-xs text-[#03E5B7] font-bold">
-          Global standings of contestants driving circular economy diversion & surviving elimination rounds.
-        </p>
+        <div className="relative z-10 flex-shrink-0">
+          <img
+            src="/images/developer-community.jpg"
+            alt="Developer Community Champions"
+            className="max-h-40 w-auto object-contain rounded-xl shadow-sm hover:scale-105 transition-transform"
+          />
+        </div>
       </div>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 p-1.5 rounded bg-[#0D0F17] border border-[#1D2133]">
+      <div className="flex flex-wrap gap-2 p-1.5 rounded-xl bg-white border border-[#E8EAED]">
         {(['Students', 'Teams', 'Departments', 'Hostels'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveCategory(tab)}
-            className={`px-5 py-2 rounded text-xs font-black transition-all ${
+            className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
               activeCategory === tab
-                ? 'bg-[#FF007A] text-white shadow-md glow-pink'
-                : 'text-slate-400 hover:text-white hover:bg-[#07080E]'
+                ? 'bg-[#4285F4] text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
             {tab}

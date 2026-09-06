@@ -31,43 +31,44 @@ export const OverviewView: React.FC = () => {
 
   return (
     <div className="space-y-6 font-mono select-none animate-in fade-in duration-300">
-      {/* HUD Header Banner */}
-      <div className="bg-[#0D0F17] border border-[#FF007A]/50 rounded-lg p-4 md:p-6 space-y-3 relative overflow-hidden">
-        {/* Background Poster Overlay */}
-        <div
-          className="absolute inset-0 opacity-20 pointer-events-none bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/squid-game/media_1787398142284.jpg')" }}
-        />
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="text-[10px] text-[#03E5B7] flex items-center gap-2 font-bold">
-            <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping flex-shrink-0" />
-            <span>◯ SQUID ECO-ARENA // CONTESTANT #456 CONTROL</span>
+      {/* GDG Citizen Action Hero Banner with workspace photo */}
+      <div className="bg-white border border-[#E8EAED] rounded-2xl p-6 relative overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="relative z-10 flex-1 space-y-3 font-sans">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#4285F4] animate-ping" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1A73E8]">
+              Air Shaktiman • GDG Citizen Workspace
+            </span>
           </div>
-          <button
-            onClick={() => setActiveTab('eco-ai')}
-            className="text-[10px] text-[#FF007A] border border-[#FF007A]/50 bg-[#160B18] px-3 py-1 rounded hover:bg-[#FF007A]/20 transition-all flex items-center gap-1 font-bold glow-pink"
-          >
-            <Bot className="w-3.5 h-3.5" />
-            <span>FRONT MAN COPILOT</span>
-          </button>
-        </div>
-
-        <div className="relative z-10">
-          <h1 className="text-2xl md:text-3xl font-black text-white tracking-widest flex items-center gap-3">
-            CITY GUARDIAN <span className="text-[#FF007A]">SQUID ARENA</span>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#202124] tracking-tight">
+            Turn Daily Waste Into Verified Impact
           </h1>
-          <p className="text-xs text-[#03E5B7] tracking-wider mt-0.5 font-bold">
-            "SURVIVE THE WASTE. DIVERT THE RECYCLABLES. WIN THE CASH POOL."
+          <p className="text-xs md:text-sm text-[#5F6368] max-w-xl">
+            Report local waste spots, earn eco points, redeem merchant coupons, and collaborate with your neighborhood eco clubs.
           </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={() => setActiveTab('report-waste')}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#4285F4] hover:bg-[#1A73E8] shadow-sm transition-all flex items-center gap-2"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>Report Waste Spot</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('redeem-rewards')}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-[#E37400] bg-[#FEF7E0] border border-[#FBBC0460] hover:bg-amber-100 transition-all flex items-center gap-2"
+            >
+              <Gift className="w-3.5 h-3.5" />
+              <span>Redeem Coupons</span>
+            </button>
+          </div>
         </div>
-
-        {/* Sub-module Tag Bar */}
-        <div className="relative z-10 pt-2 border-t border-[#1D2133] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[10px]">
-          <span className="text-[#FF007A] flex items-center gap-1.5 font-bold">
-            <span className="text-sm">◯ △ □</span>
-            ROUND 7 // LIVE CAMPUS RECYCLING PROTOCOL
-          </span>
-          <span className="text-[#FFC700] font-bold">💰 VAULT POOL: ₹45.6 BILLION</span>
+        <div className="relative z-10 flex-shrink-0">
+          <img
+            src="/images/workspace-collaboration.jpg"
+            alt="Workspace Collaboration"
+            className="max-h-40 w-auto object-contain rounded-xl shadow-sm hover:scale-105 transition-transform"
+          />
         </div>
       </div>
 
