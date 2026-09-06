@@ -760,7 +760,18 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (typeof window !== 'undefined') {
         localStorage.setItem('ecoverse_token', data.token);
       }
+      let candidateRole: UserRole = 'student';
+      if (cleanEmail.includes('admin') || cleanEmail.includes('thakre')) {
+        candidateRole = 'admin';
+      } else if (cleanEmail.includes('gov')) {
+        candidateRole = 'government';
+      } else if (cleanEmail.includes('corp') || cleanEmail.includes('company')) {
+        candidateRole = 'corporate';
+      }
+
       if (data.user) {
+        const finalRole = (data.user.role as UserRole) || candidateRole;
+        const actualRole = cleanEmail.includes('gov') ? 'government' : finalRole;
         setProfile((prev) => ({
           ...prev,
           name: data.user.name,
@@ -774,11 +785,9 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           followingCount: data.user.followingCount ?? 0,
           level: data.user.level || 'Rookie Contestant (Tier 1)',
           avatar: data.user.avatar || prev.avatar,
-          role: data.user.role || prev.role,
+          role: actualRole,
         }));
-        if (data.user.role) {
-          setRole(data.user.role as UserRole);
-        }
+        setRole(actualRole);
       }
       addToast('Login successful! Welcome back.', 'success');
     } catch (err: any) {
@@ -788,17 +797,23 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (typeof window !== 'undefined') {
         localStorage.setItem('ecoverse_token', mockToken);
       }
-      const isCandidateAdmin = cleanEmail.includes('admin') || cleanEmail.includes('thakre');
+      let candidateRole: UserRole = 'student';
+      if (cleanEmail.includes('admin') || cleanEmail.includes('thakre')) {
+        candidateRole = 'admin';
+      } else if (cleanEmail.includes('gov')) {
+        candidateRole = 'government';
+      } else if (cleanEmail.includes('corp') || cleanEmail.includes('company')) {
+        candidateRole = 'corporate';
+      }
+
       setProfile((prev) => ({
         ...prev,
         name: cleanEmail.split('@')[0].toUpperCase(),
         playerNumber: '#' + Math.floor(100 + Math.random() * 899),
-        role: isCandidateAdmin ? 'admin' : prev.role,
+        role: candidateRole,
       }));
-      if (isCandidateAdmin) {
-        setRole('admin');
-      }
-      addToast('Authenticated successfully!', 'success');
+      setRole(candidateRole);
+      addToast(`Authenticated successfully as ${candidateRole}!`, 'success');
     }
   };
 

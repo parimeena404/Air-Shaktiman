@@ -171,6 +171,61 @@ export const AuthGateView: React.FC = () => {
 
           {/* Form Body */}
           <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4">
+            {/* Quick Demo Logins for instant review */}
+            {isLoginView && (
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Quick Demo Accounts:</span>
+                  <span className="text-[10px] text-gray-400">1-click fill</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@airshaktiman.com');
+                      setPassword('password123');
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+                    style={{ border: '1px solid #EA433540', color: '#EA4335', backgroundColor: '#FCE8E6' }}
+                  >
+                    <span>🛡️</span> <span>Admin</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('gov@airshaktiman.com');
+                      setPassword('password123');
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+                    style={{ border: '1px solid #34A85340', color: '#137333', backgroundColor: '#E6F4EA' }}
+                  >
+                    <span>🏛️</span> <span>Government</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('company@airshaktiman.com');
+                      setPassword('password123');
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+                    style={{ border: '1px solid #FBBC0460', color: '#E37400', backgroundColor: '#FEF7E0' }}
+                  >
+                    <span>🏢</span> <span>Company</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('user@airshaktiman.com');
+                      setPassword('password123');
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+                    style={{ border: '1px solid #4285F440', color: '#1A73E8', backgroundColor: '#E8F0FE' }}
+                  >
+                    <span>👤</span> <span>User</span>
+                  </button>
+                </div>
+              </div>
+            )}
             {errorMsg && (
               <div className="p-3 rounded-lg flex items-start gap-2 text-sm"
                 style={{ backgroundColor: '#FCE8E6', color: '#D93025' }}>
