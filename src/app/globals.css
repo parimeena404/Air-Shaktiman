@@ -1,130 +1,401 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&family=Product+Sans:wght@400;500;700&display=swap');
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
 @layer base {
   :root {
-    --bg-dark: #07080E;
-    --card-dark: #0D0F17;
-    --card-border: #1D2133;
-    --squid-pink: #FF007A;
-    --squid-pink-glow: rgba(255, 0, 122, 0.35);
-    --squid-teal: #03E5B7;
-    --squid-teal-glow: rgba(3, 229, 183, 0.35);
-    --cyber-green: #00FF66;
-    --gold-rank: #FFC700;
+    /* GDG Color Palette */
+    --gdg-blue: #4285F4;
+    --gdg-red: #EA4335;
+    --gdg-yellow: #FBBC04;
+    --gdg-green: #34A853;
+
+    /* Surfaces */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8F9FA;
+    --bg-tertiary: #F1F3F4;
+    --bg-elevated: #FFFFFF;
+
+    /* Borders */
+    --border-light: #E8EAED;
+    --border-medium: #DADCE0;
+    --border-strong: #BDC1C6;
+
+    /* Text */
+    --text-primary: #202124;
+    --text-secondary: #5F6368;
+    --text-tertiary: #80868B;
+    --text-on-color: #FFFFFF;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(60, 64, 67, 0.1);
+    --shadow-md: 0 1px 3px rgba(60, 64, 67, 0.15), 0 1px 2px rgba(60, 64, 67, 0.1);
+    --shadow-lg: 0 4px 12px rgba(60, 64, 67, 0.15), 0 1px 4px rgba(60, 64, 67, 0.1);
+    --shadow-xl: 0 8px 24px rgba(60, 64, 67, 0.2);
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
   }
 
   body {
-    background-color: var(--bg-dark);
-    color: #e5e7eb;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: 'Inter', 'Google Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-mono, .font-hud, .font-orbitron {
-    font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', 'Google Sans', system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--text-primary);
   }
 }
 
-/* Squid Game Signature Theme & Glitch HUD Utilities */
+/* ============================================ */
+/* GDG Card & Surface Styles                    */
+/* ============================================ */
+
+.gdg-card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.gdg-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.gdg-card-interactive {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+
+.gdg-card-interactive:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* ============================================ */
+/* GDG Badge Styles                             */
+/* ============================================ */
+
+.gdg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.gdg-badge-blue {
+  background-color: #E8F0FE;
+  color: #1A73E8;
+}
+
+.gdg-badge-red {
+  background-color: #FCE8E6;
+  color: #D93025;
+}
+
+.gdg-badge-yellow {
+  background-color: #FEF7E0;
+  color: #E37400;
+}
+
+.gdg-badge-green {
+  background-color: #E6F4EA;
+  color: #137333;
+}
+
+.gdg-badge-gray {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* ============================================ */
+/* GDG Button Styles                            */
+/* ============================================ */
+
+.gdg-btn-primary {
+  background-color: var(--gdg-blue);
+  color: white;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.gdg-btn-primary:hover {
+  background-color: #1A73E8;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.4);
+}
+
+.gdg-btn-primary:active {
+  background-color: #1765CC;
+}
+
+.gdg-btn-secondary {
+  background-color: transparent;
+  color: var(--gdg-blue);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-medium);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.gdg-btn-secondary:hover {
+  background-color: #F8F9FA;
+  border-color: var(--gdg-blue);
+}
+
+/* ============================================ */
+/* GDG Accent Bar (Google 4-color stripe)       */
+/* ============================================ */
+
+.gdg-accent-bar {
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    var(--gdg-blue) 0%,
+    var(--gdg-blue) 25%,
+    var(--gdg-red) 25%,
+    var(--gdg-red) 50%,
+    var(--gdg-yellow) 50%,
+    var(--gdg-yellow) 75%,
+    var(--gdg-green) 75%,
+    var(--gdg-green) 100%
+  );
+}
+
+/* ============================================ */
+/* Sidebar & Layout                             */
+/* ============================================ */
+
+.gdg-sidebar {
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-light);
+}
+
+.gdg-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================ */
+/* Backward Compatibility — Map old classes     */
+/* ============================================ */
+
 .bg-squid-dark {
-  background-color: #07080E;
+  background-color: var(--bg-secondary);
 }
 
 .bg-squid-card {
-  background-color: #0D0F17;
-  border: 1px solid #1D2133;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-light);
 }
 
 .text-squid-pink {
-  color: #FF007A;
+  color: var(--gdg-red);
 }
 
 .text-squid-teal {
-  color: #03E5B7;
+  color: var(--gdg-blue);
 }
 
 .text-squid-gold {
-  color: #FFC700;
+  color: var(--gdg-yellow);
 }
 
 .border-squid-pink {
-  border-color: #FF007A;
+  border-color: var(--gdg-red);
 }
 
 .border-squid-teal {
-  border-color: #03E5B7;
+  border-color: var(--gdg-blue);
 }
 
 .glow-pink {
-  box-shadow: 0 0 20px rgba(255, 0, 122, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .glow-teal {
-  box-shadow: 0 0 20px rgba(3, 229, 183, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .glow-gold {
-  box-shadow: 0 0 20px rgba(255, 199, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .glow-green {
-  box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
-/* Squid Game Grid Background */
 .squid-grid-bg {
-  background-color: #07080E;
-  background-image: 
-    radial-gradient(circle at 50% 20%, rgba(255, 0, 122, 0.08) 0%, transparent 60%),
-    linear-gradient(rgba(255, 0, 122, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(3, 229, 183, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 30px 30px, 30px 30px;
+  background-color: var(--bg-secondary);
+  background-image: none;
 }
 
-/* AI HUD Scanline Effect */
 .scanline-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0),
-    rgba(255,255,255,0) 50%,
-    rgba(0, 0, 0, 0.3) 50%,
-    rgba(0, 0, 0, 0.3)
-  );
-  background-size: 100% 4px;
+  background: none;
 }
 
-/* Custom Tactical Scrollbar */
+/* ============================================ */
+/* Custom Scrollbar — Clean Light Style         */
+/* ============================================ */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #07080E;
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #FF007A;
+  background: var(--border-strong);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #03E5B7;
+  background: var(--text-tertiary);
 }
-/* Gov Portal Overrides */
-#gov-portal .bg-\[\#07080E\] { background-color: #f8f9fa !important; }
-#gov-portal .bg-\[\#0D0F17\] { background-color: #ffffff !important; }
-#gov-portal .border-\[\#1D2133\] { border-color: #e5e7eb !important; }
-#gov-portal .text-white { color: #111827 !important; }
-#gov-portal .text-slate-400 { color: #6b7280 !important; }
-#gov-portal .text-slate-300 { color: #4b5563 !important; }
-#gov-portal .text-\[\#FF007A\] { color: #f97316 !important; }
-#gov-portal .text-\[\#03E5B7\] { color: #1e3a8a !important; }
-#gov-portal .bg-\[\#FF007A\] { background-color: #f97316 !important; }
-#gov-portal .bg-\[\#03E5B7\] { background-color: #1e3a8a !important; color: #ffffff !important; }
-#gov-portal .glow-pink { box-shadow: none !important; }
-#gov-portal .glow-teal { box-shadow: none !important; }
-#gov-portal .border-\[\#FF007A\] { border-color: #f97316 !important; }
-#gov-portal .border-\[\#03E5B7\] { border-color: #1e3a8a !important; }
-#gov-portal .bg-gradient-to-r { background: #f97316 !important; }
-#gov-portal .font-mono { font-family: ui-sans-serif, system-ui, sans-serif !important; }
-#gov-portal img[src*='squid'], #gov-portal div[class*='bg-[url'] { display: none !important; }
+
+/* ============================================ */
+/* Form Inputs — GDG Style                      */
+/* ============================================ */
+
+.gdg-input {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.gdg-input:focus {
+  border-color: var(--gdg-blue);
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.gdg-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ============================================ */
+/* Animations                                   */
+/* ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.2s ease-out;
+}
+
+/* ============================================ */
+/* Override dark-themed inline styles           */
+/* These ensure existing components render      */
+/* acceptably in the new light theme.           */
+/* ============================================ */
+
+/* Remap common dark bg colors to light equivalents */
+.bg-\[\#07080E\] { background-color: var(--bg-secondary) !important; }
+.bg-\[\#0D0F17\] { background-color: var(--bg-primary) !important; }
+.border-\[\#1D2133\] { border-color: var(--border-light) !important; }
+.text-\[\#FF007A\] { color: var(--gdg-red) !important; }
+.text-\[\#03E5B7\] { color: var(--gdg-blue) !important; }
+.text-\[\#FFC700\] { color: var(--gdg-yellow) !important; }
+.text-\[\#00FF66\] { color: var(--gdg-green) !important; }
+.bg-\[\#FF007A\] { background-color: var(--gdg-red) !important; }
+.bg-\[\#03E5B7\] { background-color: var(--gdg-blue) !important; color: white !important; }
+.bg-\[\#FFC700\] { background-color: var(--gdg-yellow) !important; }
+.border-\[\#FF007A\] { border-color: var(--gdg-red) !important; }
+.border-\[\#03E5B7\] { border-color: var(--gdg-blue) !important; }
+.bg-\[\#180B1B\] { background-color: #E8F0FE !important; }
+.bg-\[\#FF007A\]\/15 { background-color: #FCE8E6 !important; }
+.bg-\[\#FF007A\]\/20 { background-color: #FCE8E6 !important; }
+.bg-\[\#03E5B7\]\/15 { background-color: #E8F0FE !important; }
+.bg-\[\#03E5B7\]\/20 { background-color: #E8F0FE !important; }
+.bg-\[\#FFC700\]\/20 { background-color: #FEF7E0 !important; }
+.border-\[\#FF007A\]\/40 { border-color: rgba(234, 67, 53, 0.3) !important; }
+.border-\[\#FF007A\]\/50 { border-color: rgba(234, 67, 53, 0.4) !important; }
+.border-\[\#03E5B7\]\/40 { border-color: rgba(66, 133, 244, 0.3) !important; }
+.border-\[\#03E5B7\]\/50 { border-color: rgba(66, 133, 244, 0.4) !important; }
+.border-\[\#FFC700\]\/40 { border-color: rgba(251, 188, 4, 0.3) !important; }
+
+/* Text color overrides for readability on light backgrounds */
+.text-white { color: var(--text-primary) !important; }
+.text-slate-100 { color: var(--text-primary) !important; }
+.text-slate-200 { color: var(--text-primary) !important; }
+.text-slate-300 { color: var(--text-secondary) !important; }
+.text-slate-400 { color: var(--text-secondary) !important; }
+.text-slate-500 { color: var(--text-tertiary) !important; }
+.text-slate-600 { color: var(--text-tertiary) !important; }
+
+/* Shadow overrides */
+.shadow-\[0_0_80px_rgba\(255\,0\,122\,0\.35\)\] { box-shadow: var(--shadow-xl) !important; }
+.shadow-\[0_0_30px_rgba\(3\,229\,183\,0\.4\)\] { box-shadow: var(--shadow-lg) !important; }
+.shadow-\[0_0_15px_rgba\(255\,0\,122\,0\.3\)\] { box-shadow: var(--shadow-md) !important; }
+.shadow-\[0_0_20px_rgba\(255\,0\,122\,0\.4\)\] { box-shadow: var(--shadow-md) !important; }
+
+/* Gradient overrides */
+.bg-gradient-to-r.from-\[\#FF007A\] { background: var(--gdg-blue) !important; }
+.from-\[\#FF007A\] { --tw-gradient-from: var(--gdg-blue) !important; }
+.via-\[\#FFC700\] { --tw-gradient-via: var(--gdg-yellow) !important; }
+.to-\[\#03E5B7\] { --tw-gradient-to: var(--gdg-green) !important; }
+
+/* Placeholder colors for light theme */
+.placeholder-slate-600::placeholder { color: var(--text-tertiary) !important; }
+
+/* Font overrides */
+.font-mono { font-family: 'Inter', system-ui, sans-serif !important; }

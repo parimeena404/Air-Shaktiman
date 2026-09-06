@@ -5,282 +5,248 @@ import { useEco } from '../../context/EcoContext';
 import {
   Bell,
   Sparkles,
-  Flame,
-  Crown,
   Bot,
   Shield,
   Menu,
   X,
   CheckCircle2,
-  Clock,
-  Radio,
   LogIn,
   LogOut,
-  UserCheck,
 } from 'lucide-react';
 import { MainTab } from '../../types';
 
 export const Header: React.FC = () => {
   const { profile, role, setRole, activeTab, setActiveTab, alerts, toasts, removeToast, isMobileMenuOpen, toggleMobileMenu, isAuthenticated, openAuthModal, logout, clearAlert, clearAllAlerts } = useEco();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [timeString, setTimeString] = useState('');
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeString(now.toTimeString().split(' ')[0]);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const getPageTitle = (tab: MainTab): string => {
     switch (tab) {
       case 'overview':
-        return 'CITY GUARDIAN ARENA';
+        return role === 'government' ? 'Government Dashboard' : role === 'admin' ? 'Admin Dashboard' : 'Dashboard';
       case 'report-waste':
-        return 'WASTE DISPOSAL // PROTOCOL';
+        return 'Report Waste';
       case 'contributions':
-        return 'CONTRIBUTION MATRIX';
+        return 'My Contributions';
       case 'eco-ai':
-        return 'AI HANDLER COPILOT';
+        return 'AI Assistant';
       case 'nearby':
-        return 'WORLD MAP & DISCOVERY';
+        return 'Nearby Map';
       case 'redeem-rewards':
-        return 'REWARD VAULT';
+        return 'Redeem Points';
       case 'my-rewards':
-        return 'ACTIVE VOUCHERS';
+        return 'My Vouchers';
       case 'partner-network':
-        return 'ECO PARTNERS DIRECTORY';
+        return 'Partner Directory';
       case 'community-feed':
-        return 'SOCIAL HUB // COMMUNITY';
+        return 'Community Feed';
       case 'community-groups':
-        return 'SQUADS & CLUBS';
+        return 'Eco Clubs & Events';
       case 'community-profile':
-        return 'PLAYER PROFILE';
+        return 'Profile';
       case 'market':
-        return 'ECO MARKETPLACE';
+        return 'EcoMarket';
       case 'industry-demand':
-        return 'INDUSTRY DEMAND BOARD';
+        return 'Industry Demand';
       case 'matching':
-        return 'AI MATCH MATRIX';
+        return 'AI Match System';
       case 'reuse-ideas':
-        return 'BUILD FROM WASTE';
+        return 'Build From Waste';
       case 'community-projects':
-        return 'GUILD PROJECTS';
+        return 'Projects';
       case 'ecofood':
-        return 'ECOFOOD SURPLUS MARKET';
+        return 'EcoFood Marketplace';
       case 'ecofood-partner':
-        return 'RESTAURANT PARTNER PORTAL';
+        return 'Restaurant Partners';
       case 'ecofood-ngo':
-        return 'NGO FOOD RESCUE ALLIANCE';
+        return 'NGO Food Rescue';
       case 'government-connect':
-        return 'CIVIC & GOV CONNECT';
+        return 'Government Connect';
       case 'civic-reporting':
-        return 'CIVIC ISSUE TRACKER';
+        return 'Civic Issue Tracker';
       case 'challenges':
-        return 'DAILY PROTOCOL & CHALLENGES';
+        return 'Eco Challenges';
       case 'leaderboard':
-        return 'ARENA RANKING';
+        return 'Leaderboard';
       case 'rewards':
-        return 'REWARDS VAULT';
+        return 'Rewards';
       case 'campus-monitor':
-        return 'CITY MONITOR';
+        return 'City Monitor';
       case 'energy':
-        return 'ENERGY ANALYTICS';
+        return 'Energy Analytics';
       case 'water':
-        return 'WATER ANALYTICS';
+        return 'Water Analytics';
       case 'waste-analytics':
-        return 'WASTE COMPOSITION';
+        return 'Waste Analytics';
       case 'admin-overview':
-        return 'COMMAND CENTER // ADMIN';
+        return 'Admin Dashboard';
       case 'cleanup-operations':
-        return 'CLEANUP DISPATCH';
+        return 'Cleanup Operations';
       case 'material-flow':
-        return 'MATERIAL FLOW MATRIX';
+        return 'Material Flow';
       case 'user-management':
-        return 'USER DIRECTORY';
+        return 'User Directory';
       case 'impact-dashboard':
-        return 'GLOBAL IMPACT DASHBOARD';
+        return 'Impact Dashboard';
       case 'csr-hub':
-        return 'CSR IMPACT HUB // ARENA';
+        return 'CSR Impact Hub';
       case 'csr-missions':
-        return 'LIVE CSR SPONSORED MISSIONS';
+        return 'CSR Missions';
       case 'csr-projects':
-        return 'DISCOVER CSR PROJECTS';
+        return 'CSR Projects';
       case 'csr-funding':
-        return 'CSR FUNDING CENTER // PIPELINE';
+        return 'CSR Funding Center';
       case 'csr-impact':
-        return 'CSR IMPACT INTELLIGENCE';
+        return 'CSR Impact Dashboard';
       case 'csr-leaderboard':
-        return 'CSR GLOBAL RANKING // LEADERBOARD';
+        return 'CSR Leaderboard';
       case 'csr-reports':
-        return 'CSR IMPACT AUDIT REPORTS';
+        return 'CSR Reports';
       default:
-        return 'CITY GUARDIAN ARENA';
+        return 'Dashboard';
     }
   };
 
+  // Role badge config
+  const roleBadgeConfig: Record<string, { label: string; color: string; bg: string }> = {
+    student: { label: 'User', color: '#4285F4', bg: '#E8F0FE' },
+    corporate: { label: 'Corporate', color: '#E37400', bg: '#FEF7E0' },
+    admin: { label: 'Admin', color: '#D93025', bg: '#FCE8E6' },
+    government: { label: 'Government', color: '#137333', bg: '#E6F4EA' },
+  };
+
+  const currentRoleBadge = roleBadgeConfig[role] || roleBadgeConfig.student;
+
   return (
-    <header className="sticky top-0 z-30 bg-[#050B08]/95 backdrop-blur-md border-b border-[#12281D] px-3 sm:px-4 md:px-6 py-2.5 flex items-center justify-between font-mono select-none">
+    <header
+      className="sticky top-0 z-30 backdrop-blur-md px-3 sm:px-4 md:px-6 py-3 flex items-center justify-between select-none"
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid #E8EAED',
+        boxShadow: '0 1px 3px rgba(60, 64, 67, 0.08)',
+      }}
+    >
       {/* Toast Notification Container */}
       <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2 max-w-none sm:max-w-sm w-auto pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-3 rounded-lg border text-xs font-mono shadow-2xl flex items-center justify-between backdrop-blur-md animate-in slide-in-from-top-4 ${
-              toast.type === 'success'
-                ? 'bg-[#09120D] border-[#00FF66] text-[#00FF66] shadow-[#00FF66]/20'
-                : toast.type === 'warning'
-                ? 'bg-[#09120D] border-[#F5C518] text-[#F5C518] shadow-[#F5C518]/20'
-                : 'bg-[#09120D] border-red-500 text-red-400 shadow-red-500/20'
-            }`}
+            className="pointer-events-auto p-3 rounded-xl text-sm flex items-center justify-between animate-fade-in-up"
+            style={{
+              backgroundColor: toast.type === 'success' ? '#E6F4EA' : toast.type === 'warning' ? '#FEF7E0' : '#FCE8E6',
+              color: toast.type === 'success' ? '#137333' : toast.type === 'warning' ? '#E37400' : '#D93025',
+              border: `1px solid ${toast.type === 'success' ? '#34A853' : toast.type === 'warning' ? '#FBBC04' : '#EA4335'}40`,
+              boxShadow: '0 4px 12px rgba(60, 64, 67, 0.15)',
+            }}
           >
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              <span>{toast.message}</span>
+              <span className="text-xs font-medium">{toast.message}</span>
             </div>
-            <button onClick={() => removeToast(toast.id)} className="text-slate-400 hover:text-white ml-2">
+            <button onClick={() => removeToast(toast.id)} className="ml-2 opacity-60 hover:opacity-100">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}
       </div>
 
-      {/* Left: Mobile Toggle & Live Event Indicator */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      {/* Left: Mobile Toggle & Page Title */}
+      <div className="flex items-center gap-3">
         <button
           onClick={toggleMobileMenu}
-          className="md:hidden text-[#FF007A] hover:text-white p-1 rounded hover:bg-[#0D0F17] transition-all"
+          className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
           aria-label="Toggle Navigation Menu"
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? (
+            <X className="w-5 h-5" style={{ color: '#5F6368' }} />
+          ) : (
+            <Menu className="w-5 h-5" style={{ color: '#5F6368' }} />
+          )}
         </button>
 
-        {/* Live Event Ticker Badge */}
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#0D0F17] border border-[#FF007A]/50 px-2 sm:px-3 py-1 rounded text-xs">
-          <span className="w-2 h-2 rounded-full bg-[#FF007A] animate-ping flex-shrink-0" />
-          <span className="text-[#FF007A] font-black tracking-wider text-[11px] sm:text-xs">◯ SQUID ARENA</span>
-          <span className="text-slate-400 hidden sm:inline text-[10px]">ZERO WASTE RAID</span>
+        {/* Page Title */}
+        <div className="flex items-center gap-2">
+          <h2 className="text-base sm:text-lg font-bold" style={{ color: '#202124' }}>
+            {getPageTitle(activeTab)}
+          </h2>
+          <span
+            className="hidden sm:inline-flex text-[10px] px-2 py-0.5 rounded-full font-semibold"
+            style={{ backgroundColor: currentRoleBadge.bg, color: currentRoleBadge.color }}
+          >
+            {currentRoleBadge.label}
+          </span>
         </div>
       </div>
 
-      {/* Center: Player XP & Info Bar */}
-      <div className="hidden lg:flex items-center gap-4 bg-[#0D0F17] border border-[#FF007A]/40 px-4 py-1.5 rounded-lg shadow-md">
-        {/* Initial Badge Box */}
-        <div className="w-8 h-8 rounded bg-[#FF007A]/20 border border-[#FF007A] flex items-center justify-center text-[#FF007A] font-black text-xs">
-          {profile.playerNumber || '#456'}
-        </div>
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Eco Points */}
+        {role !== 'admin' && (
+          <button
+            onClick={() => setActiveTab('redeem-rewards')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-xs font-semibold"
+            style={{
+              backgroundColor: '#FEF7E0',
+              color: '#E37400',
+              border: '1px solid #FBBC0440',
+            }}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{profile.ecoPoints.toLocaleString()} Pts</span>
+          </button>
+        )}
 
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-slate-400 text-[10px]">CONTESTANT // {profile.playerNumber || '#456'}</span>
-            <span className="text-white font-bold text-xs tracking-wide uppercase">{profile.name}</span>
-            <span className="text-[10px] px-1.5 py-0.2 bg-[#03E5B7]/20 border border-[#03E5B7]/40 text-[#03E5B7] rounded font-bold">
-              LVL 12
-            </span>
-          </div>
-          {/* XP Progress bar */}
-          <div className="flex items-center gap-2 mt-0.5">
-            <div className="w-32 bg-[#07080E] h-1.5 rounded-full overflow-hidden border border-[#1D2133]">
-              <div className="bg-[#FF007A] h-full rounded-full glow-pink" style={{ width: '84%' }} />
-            </div>
-            <span className="text-[9px] text-[#03E5B7] font-bold">8,420 / 10,000 XP</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Right: HUD Stats & Time Indicator */}
-      <div className="flex items-center gap-3 md:gap-5">
-        {/* Eco Points / Debarred Admin Status */}
-        <div
-          onClick={() => setActiveTab('redeem-rewards')}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0D0F17] border transition-all ${
-            role === 'admin'
-              ? 'border-red-500/60 bg-red-950/20'
-              : 'border-[#FFC700]/50 hover:border-[#FFC700] glow-gold cursor-pointer'
-          }`}
-        >
-          <Sparkles className={`w-3.5 h-3.5 ${role === 'admin' ? 'text-red-400' : 'text-[#FFC700]'}`} />
-          <div className="flex flex-col text-left">
-            <span className="text-[9px] text-slate-400 leading-none font-bold">
-              {role === 'admin' ? 'CONTEST STATUS' : 'ECO CASH POOL'}
-            </span>
-            <span className={`text-xs font-black leading-tight ${
-              role === 'admin' ? 'text-red-400 font-mono' : 'text-[#FFC700]'
-            }`}>
-              {role === 'admin' ? 'DEBARRED (0 Pts)' : `₹${profile.ecoPoints.toLocaleString()} Pts`}
-            </span>
-          </div>
-        </div>
-
-        {/* Streak Days */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0D0F17] border border-[#FF007A]/40">
-          <Flame className="w-3.5 h-3.5 text-[#FF007A]" />
-          <div className="flex flex-col text-left">
-            <span className="text-[9px] text-slate-400 leading-none">SURVIVAL STREAK</span>
-            <span className="text-xs font-bold text-white leading-tight">12 DAYS</span>
-          </div>
-        </div>
-
-        {/* Global Rank */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0D0F17] border border-[#03E5B7]/40">
-          <Crown className="w-3.5 h-3.5 text-[#03E5B7]" />
-          <div className="flex flex-col text-left">
-            <span className="text-[9px] text-slate-400 leading-none">RANK</span>
-            <span className="text-xs font-bold text-[#03E5B7] leading-tight">#27 / 456</span>
-          </div>
-        </div>
-
-        {/* Clock & Sync Status */}
-        <div className="hidden xl:flex flex-col text-right">
-          <span className="text-[9px] text-slate-400">ARENA TIMER</span>
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-white font-black tracking-widest">{timeString || '14:28:42'}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#03E5B7] animate-ping" />
-            <span className="text-[9px] text-[#03E5B7] font-bold">LIVE</span>
-          </div>
-        </div>
-
-        {/* AI Handler Launch */}
+        {/* AI Assistant */}
         <button
           onClick={() => setActiveTab('eco-ai')}
-          className="p-1.5 rounded bg-[#00FF66]/10 border border-[#00FF66]/50 text-[#00FF66] hover:bg-[#00FF66]/20 transition-all glow-green-sm"
-          title="Eco AI Handler"
+          className="p-2 rounded-full transition-all"
+          style={{
+            backgroundColor: '#E8F0FE',
+            color: '#4285F4',
+          }}
+          title="AI Assistant"
         >
           <Bot className="w-4 h-4" />
         </button>
 
-        {/* System Notifications */}
+        {/* Notifications */}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-1.5 rounded bg-[#09120D] border border-[#12281D] text-slate-400 hover:text-white relative"
+            className="p-2 rounded-full transition-all relative"
+            style={{
+              backgroundColor: showNotifications ? '#E8F0FE' : '#F1F3F4',
+              color: showNotifications ? '#4285F4' : '#5F6368',
+            }}
           >
             <Bell className="w-4 h-4" />
             {alerts.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00FF66] rounded-full animate-ping" />
+              <span
+                className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center text-white"
+                style={{ backgroundColor: '#EA4335' }}
+              >
+                {alerts.length}
+              </span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#09120D] border border-[#00FF66]/40 rounded-2xl shadow-2xl p-4 z-50 text-xs font-mono space-y-3 animate-in zoom-in-95">
-              <div className="flex items-center justify-between border-b border-[#12281D] pb-2.5">
-                <span className="font-bold text-[#00FF66] flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-[#00FF66]" />
-                  <span>SYSTEM ALERTS</span>
+            <div
+              className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl p-4 z-50 text-xs space-y-3 animate-fade-in-up"
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E8EAED',
+                boxShadow: '0 8px 24px rgba(60, 64, 67, 0.2)',
+              }}
+            >
+              <div className="flex items-center justify-between pb-2.5" style={{ borderBottom: '1px solid #E8EAED' }}>
+                <span className="font-bold flex items-center gap-2" style={{ color: '#202124' }}>
+                  <Bell className="w-4 h-4" style={{ color: '#4285F4' }} />
+                  Notifications
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#00FF66]/10 text-[#00FF66] font-bold border border-[#00FF66]/30">
-                    {alerts.length}/5 RECENT
-                  </span>
+                  <span className="gdg-badge gdg-badge-blue">{alerts.length} new</span>
                   {alerts.length > 0 && (
-                    <button
-                      onClick={clearAllAlerts}
-                      className="text-[10px] text-slate-400 hover:text-red-400 transition"
-                      title="Clear all alerts"
-                    >
+                    <button onClick={clearAllAlerts} className="text-[10px] hover:underline" style={{ color: '#EA4335' }}>
                       Clear All
                     </button>
                   )}
@@ -291,40 +257,41 @@ export const Header: React.FC = () => {
                 {alerts.map((alt) => (
                   <div
                     key={alt.id}
-                    className="p-2.5 rounded-xl bg-[#050B08] border border-[#12281D] hover:border-[#00FF66]/40 transition-colors space-y-1 relative group"
+                    className="p-3 rounded-lg transition-colors space-y-1 relative group"
+                    style={{
+                      backgroundColor: '#F8F9FA',
+                      border: '1px solid #E8EAED',
+                    }}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-white text-xs line-clamp-1">{alt.title}</span>
+                      <span className="font-semibold text-xs line-clamp-1" style={{ color: '#202124' }}>{alt.title}</span>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <span
-                          className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
-                            alt.severity === 'Critical'
-                              ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                              : alt.severity === 'Warning'
-                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                              : 'bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/40'
+                          className={`gdg-badge ${
+                            alt.severity === 'Critical' ? 'gdg-badge-red' :
+                            alt.severity === 'Warning' ? 'gdg-badge-yellow' : 'gdg-badge-green'
                           }`}
                         >
                           {alt.severity}
                         </span>
                         <button
                           onClick={() => clearAlert(alt.id)}
-                          className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-opacity p-0.5"
-                          title="Dismiss"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
+                          style={{ color: '#80868B' }}
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-300 leading-snug">{alt.message}</p>
+                    <p className="text-[11px] leading-snug" style={{ color: '#5F6368' }}>{alt.message}</p>
                     {alt.timestamp && (
-                      <div className="text-[9px] text-slate-500 text-right">{alt.timestamp}</div>
+                      <div className="text-[9px] text-right" style={{ color: '#80868B' }}>{alt.timestamp}</div>
                     )}
                   </div>
                 ))}
                 {alerts.length === 0 && (
-                  <div className="text-center py-6 text-slate-500 text-xs">
-                    No active system alerts.
+                  <div className="text-center py-6 text-xs" style={{ color: '#80868B' }}>
+                    No notifications
                   </div>
                 )}
               </div>
@@ -332,38 +299,32 @@ export const Header: React.FC = () => {
           )}
         </div>
 
-        {/* Switch to Admin Button - Admin Accounts Only */}
-        {(profile.role === 'admin' || role === 'admin') && (
-          <button
-            onClick={() => {
-              setRole('admin');
-              setActiveTab('admin');
-            }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/70 text-white hover:bg-[#FF007A] text-xs font-bold transition-all shadow-[0_0_15px_rgba(255,0,122,0.3)] font-mono glow-pink group"
-            title="Switch to Admin Control Suite"
-          >
-            <Shield className="w-3.5 h-3.5 text-[#FF007A] group-hover:text-white transition-colors" />
-            <span className="tracking-wide">SWITCH TO ADMIN</span>
-          </button>
-        )}
-
-        {/* Authentication Button */}
+        {/* Auth Button */}
         {isAuthenticated ? (
           <button
             onClick={logout}
-            className="px-2.5 py-1 rounded bg-[#FF007A]/20 border border-[#FF007A]/50 text-[#FF007A] font-bold text-xs hover:bg-[#FF007A]/30 transition-all flex items-center gap-1.5 font-mono"
-            title="Logout of EcoVerse"
+            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5"
+            style={{
+              backgroundColor: '#F1F3F4',
+              color: '#5F6368',
+              border: '1px solid #E8EAED',
+            }}
+            title="Sign Out"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">LOGOUT</span>
+            <span className="hidden sm:inline">Sign Out</span>
           </button>
         ) : (
           <button
             onClick={openAuthModal}
-            className="px-3 py-1 rounded bg-gradient-to-r from-[#FF007A] to-[#03E5B7] text-[#07080E] font-black text-xs hover:brightness-110 transition-all shadow-[0_0_15px_rgba(3,229,183,0.3)] flex items-center gap-1.5 font-mono"
+            className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-all flex items-center gap-1.5"
+            style={{
+              backgroundColor: '#4285F4',
+              boxShadow: '0 1px 3px rgba(66, 133, 244, 0.4)',
+            }}
           >
             <LogIn className="w-3.5 h-3.5" />
-            <span>JOIN ARENA</span>
+            <span>Sign In</span>
           </button>
         )}
       </div>

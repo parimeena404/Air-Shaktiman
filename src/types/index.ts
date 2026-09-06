@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'admin' | 'business' | 'ngo' | 'corporate';
+export type UserRole = 'student' | 'admin' | 'business' | 'ngo' | 'corporate' | 'government';
 
 export type MainTab =
   // Main & Discover

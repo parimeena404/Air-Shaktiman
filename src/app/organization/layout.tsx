@@ -6,7 +6,7 @@ import { SquidCyberBackground } from '../../components/layout/SquidCyberBackgrou
 
 export default function OrganizationLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen relative">
+    <div className="flex min-h-screen relative" style={{ backgroundColor: '#F8F9FA' }}>
       <SquidCyberBackground />
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 relative z-10">

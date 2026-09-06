@@ -40,6 +40,7 @@ import {
   FileText,
   Sprout,
   X,
+  LogOut,
 } from 'lucide-react';
 
 interface NavItem {
@@ -54,14 +55,38 @@ interface NavSection {
   items: NavItem[];
 }
 
+// Google color mapping for section titles
+const sectionColors: Record<string, string> = {
+  'MISSION CONTROL': '#4285F4',
+  'DISCOVER & NEARBY': '#EA4335',
+  'COMMUNITY': '#34A853',
+  'CIRCULAR ECONOMY': '#FBBC04',
+  'ECO FOOD': '#EA4335',
+  'GOVERNMENT & CIVIC': '#34A853',
+  'CHALLENGES & REWARDS': '#4285F4',
+  'CITY INTELLIGENCE': '#FBBC04',
+  'IMPACT': '#34A853',
+  'CORPORATE IMPACT': '#FBBC04',
+  'OPERATIONS': '#4285F4',
+  'CIRCULAR MARKET': '#34A853',
+  'PARTNER NETWORK': '#EA4335',
+  'COMMUNITY SOCIAL': '#34A853',
+  'FOOD RESCUE': '#EA4335',
+  'GOVERNMENT': '#34A853',
+  'ANALYTICS': '#FBBC04',
+  'CIVIC OPERATIONS': '#4285F4',
+  'MONITORING': '#FBBC04',
+  'GOVERNMENT PORTAL': '#34A853',
+};
+
 export const Sidebar: React.FC = () => {
   const { activeTab, setActiveTab, profile, role, setRole, isMobileMenuOpen, closeMobileMenu, isAuthenticated, openAuthModal, logout } = useEco();
 
   const csrSection: NavSection = {
     title: 'CORPORATE IMPACT',
     items: [
-      { id: 'csr-hub', label: 'CSR Impact Hub', icon: Building2, badge: 'ARENA' },
-      { id: 'csr-missions', label: 'CSR Missions', icon: Target, badge: 'SPONSORED' },
+      { id: 'csr-hub', label: 'CSR Impact Hub', icon: Building2 },
+      { id: 'csr-missions', label: 'CSR Missions', icon: Target },
       { id: 'csr-projects', label: 'Discover Projects', icon: Sprout },
       { id: 'csr-funding', label: 'Funding Center', icon: Coins, badge: '₹4.8Cr' },
       { id: 'csr-impact', label: 'Impact Dashboard', icon: BarChart3 },
@@ -78,24 +103,24 @@ export const Sidebar: React.FC = () => {
         { id: 'overview', label: 'Overview', icon: LayoutDashboard },
         { id: 'report-waste', label: 'Report Waste', icon: Camera, badge: '+10 Pts' },
         { id: 'contributions', label: 'My Contributions', icon: History },
-        { id: 'eco-ai', label: 'Eco AI Handler', icon: Bot, badge: 'Copilot' },
+        { id: 'eco-ai', label: 'Eco AI Assistant', icon: Bot, badge: 'AI' },
       ],
     },
     {
-      title: 'DISCOVER & NEARBY MAP',
+      title: 'DISCOVER & NEARBY',
       items: [
-        { id: 'nearby', label: 'Nearby Map', icon: MapPin, badge: '🔵 YOU' },
-        { id: 'redeem-rewards', label: 'Redeem Eco Points', icon: Gift, badge: 'Vault' },
+        { id: 'nearby', label: 'Nearby Map', icon: MapPin },
+        { id: 'redeem-rewards', label: 'Redeem Eco Points', icon: Gift },
         { id: 'my-rewards', label: 'My Vouchers', icon: QrCode },
         { id: 'partner-network', label: 'Partner Directory', icon: Store },
       ],
     },
     {
-      title: 'COMMUNITY SOCIAL',
+      title: 'COMMUNITY',
       items: [
-        { id: 'community-feed', label: 'Community Feed', icon: Globe, badge: 'Social' },
+        { id: 'community-feed', label: 'Community Feed', icon: Globe },
         { id: 'community-groups', label: 'Eco Clubs & Events', icon: Users },
-        { id: 'community-profile', label: 'Social Profile', icon: User },
+        { id: 'community-profile', label: 'Profile', icon: User },
       ],
     },
     {
@@ -103,15 +128,15 @@ export const Sidebar: React.FC = () => {
       items: [
         { id: 'market', label: 'EcoMarket', icon: ShoppingBag },
         { id: 'industry-demand', label: 'Industry Demand', icon: Building2, badge: 'B2B' },
-        { id: 'matching', label: 'AI Match Matrix', icon: Cpu },
+        { id: 'matching', label: 'AI Match', icon: Cpu },
         { id: 'reuse-ideas', label: 'Build From Waste', icon: Hammer },
-        { id: 'community-projects', label: 'Guild Projects', icon: Users },
+        { id: 'community-projects', label: 'Projects', icon: Users },
       ],
     },
     {
-      title: 'ECOFOOD SURPLUS NETWORK',
+      title: 'ECO FOOD',
       items: [
-        { id: 'ecofood', label: 'EcoFood Marketplace', icon: Utensils, badge: '50% OFF' },
+        { id: 'ecofood', label: 'Food Marketplace', icon: Utensils },
         { id: 'ecofood-partner', label: 'Restaurant Partner', icon: Store },
         { id: 'ecofood-ngo', label: 'NGO Food Rescue', icon: HeartHandshake },
       ],
@@ -119,16 +144,16 @@ export const Sidebar: React.FC = () => {
     {
       title: 'GOVERNMENT & CIVIC',
       items: [
-        { id: 'government-connect', label: 'Government Connect', icon: Landmark, badge: 'CPCB/LiFE' },
+        { id: 'government-connect', label: 'Government Connect', icon: Landmark },
         { id: 'civic-reporting', label: 'Civic Issue Tracker', icon: ShieldAlert },
       ],
     },
     {
-      title: 'SURVIVAL ARENA',
+      title: 'CHALLENGES & REWARDS',
       items: [
-        { id: 'challenges', label: 'Eco Challenges', icon: Trophy, badge: '₹25k' },
+        { id: 'challenges', label: 'Eco Challenges', icon: Trophy },
         { id: 'leaderboard', label: 'Leaderboard', icon: Award },
-        { id: 'rewards', label: 'Rewards Vault', icon: Gift },
+        { id: 'rewards', label: 'Rewards', icon: Gift },
       ],
     },
     {
@@ -141,8 +166,8 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: 'GLOBAL IMPACT',
-      items: [{ id: 'impact-dashboard', label: 'Impact Matrix', icon: BarChart3 }],
+      title: 'IMPACT',
+      items: [{ id: 'impact-dashboard', label: 'Impact Dashboard', icon: BarChart3 }],
     },
   ];
 
@@ -173,7 +198,7 @@ export const Sidebar: React.FC = () => {
       items: [
         { id: 'admin-overview', label: 'Admin Dashboard', icon: LayoutDashboard },
         { id: 'report-waste', label: 'Waste Reports', icon: Camera },
-        { id: 'cleanup-operations', label: 'Cleanup Operations', icon: ShieldAlert, badge: '12 Pending' },
+        { id: 'cleanup-operations', label: 'Cleanup Operations', icon: ShieldAlert, badge: '12' },
       ],
     },
     {
@@ -230,11 +255,46 @@ export const Sidebar: React.FC = () => {
     },
   ];
 
+  // Government Navigation Sections
+  const governmentSections: NavSection[] = [
+    {
+      title: 'GOVERNMENT PORTAL',
+      items: [
+        { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'government-connect', label: 'Government Programs', icon: Landmark },
+        { id: 'civic-reporting', label: 'Civic Issue Tracker', icon: ShieldAlert },
+      ],
+    },
+    {
+      title: 'CIVIC OPERATIONS',
+      items: [
+        { id: 'cleanup-operations', label: 'Cleanup Operations', icon: Shield, badge: 'Active' },
+        { id: 'material-flow', label: 'Material Flow', icon: GitMerge },
+        { id: 'user-management', label: 'Citizen Directory', icon: Users },
+      ],
+    },
+    {
+      title: 'MONITORING',
+      items: [
+        { id: 'campus-monitor', label: 'City Monitor', icon: Activity },
+        { id: 'energy', label: 'Energy Grid', icon: Zap },
+        { id: 'water', label: 'Water Monitor', icon: Droplet },
+        { id: 'waste-analytics', label: 'Waste Analytics', icon: Trash2 },
+      ],
+    },
+    {
+      title: 'IMPACT',
+      items: [{ id: 'impact-dashboard', label: 'Impact Dashboard', icon: BarChart3 }],
+    },
+  ];
+
   const currentSections =
     role === 'corporate'
       ? corporateSections
       : role === 'admin'
       ? adminSections
+      : role === 'government'
+      ? governmentSections
       : studentSections;
 
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -262,80 +322,109 @@ export const Sidebar: React.FC = () => {
     closeMobileMenu();
   };
 
-  const handleRoleChange = (newRole: 'student' | 'corporate' | 'admin') => {
+  const handleRoleChange = (newRole: 'student' | 'corporate' | 'admin' | 'government') => {
     if (newRole === 'admin' && profile.role !== 'admin') {
       return;
     }
     if (newRole === 'corporate' && profile.role !== 'corporate' && profile.role !== 'admin') {
       return;
     }
+    if (newRole === 'government' && profile.role !== 'government' && profile.role !== 'admin') {
+      return;
+    }
     setRole(newRole);
     if (newRole === 'corporate') {
       setActiveTab('csr-hub');
+    } else if (newRole === 'government') {
+      setActiveTab('overview');
     }
     closeMobileMenu();
   };
 
+  // Role badge styling
+  const roleBadgeConfig: Record<string, { label: string; color: string; bg: string }> = {
+    student: { label: 'User', color: '#4285F4', bg: '#E8F0FE' },
+    corporate: { label: 'Corporate', color: '#E37400', bg: '#FEF7E0' },
+    admin: { label: 'Admin', color: '#D93025', bg: '#FCE8E6' },
+    government: { label: 'Government', color: '#137333', bg: '#E6F4EA' },
+  };
+
+  const currentRoleBadge = roleBadgeConfig[role] || roleBadgeConfig.student;
+
   const renderInnerContent = (isMobile = false) => (
     <>
       {/* Brand Header */}
-      <div className="p-4 border-b border-[#1D2133] space-y-1 bg-[#0D0F17] font-mono">
+      <div className="p-4 border-b" style={{ borderColor: '#E8EAED' }}>
         <div className="flex items-center justify-between">
-          <h1 className="font-black text-xl text-white tracking-wider flex items-center gap-2">
-            <span className="text-[#FF007A] text-lg font-bold">◯ △ □</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF007A] via-[#FFC700] to-[#03E5B7]">
-              CITY GUARDIAN
-            </span>
-          </h1>
+          <div className="flex items-center gap-2.5">
+            {/* Google 4-dot logo */}
+            <div className="flex gap-0.5">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#4285F4' }} />
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#EA4335' }} />
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FBBC04' }} />
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#34A853' }} />
+            </div>
+            <h1 className="font-bold text-base" style={{ color: '#202124' }}>
+              Air Shaktiman
+            </h1>
+          </div>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FF007A]/20 border border-[#FF007A]/40 text-[#FF007A] font-bold">
-              SQUID EDITION
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+              style={{ backgroundColor: currentRoleBadge.bg, color: currentRoleBadge.color }}
+            >
+              {currentRoleBadge.label}
             </span>
             {isMobile && (
               <button
                 onClick={closeMobileMenu}
-                className="text-slate-400 hover:text-white p-1 rounded hover:bg-[#1D2133]"
+                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                 aria-label="Close Mobile Menu"
               >
-                <X className="w-5 h-5 text-[#FF007A]" />
+                <X className="w-5 h-5" style={{ color: '#5F6368' }} />
               </button>
             )}
           </div>
         </div>
-        <div className="flex items-center justify-between text-[10px] text-[#03E5B7]">
-          <span>CONTESTANT ARENA // R7</span>
-          <span className="text-[#FF007A] flex items-center gap-1 font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF007A] inline-block animate-ping" />
-            GAME ACTIVE
-          </span>
-        </div>
       </div>
 
       {/* Role Mode Selector */}
-      <div className="px-3 py-2 bg-[#0D0F17] border-b border-[#1D2133] flex items-center justify-between text-xs font-sans">
-        <span className="text-slate-400 text-[10px] font-bold">ROLE //</span>
-        <div className="inline-flex p-0.5 rounded bg-[#07080E] border border-[#1D2133]">
+      <div className="px-3 py-2 border-b flex items-center justify-between text-xs"
+        style={{ borderColor: '#E8EAED', backgroundColor: '#F8F9FA' }}>
+        <span className="text-[10px] font-semibold" style={{ color: '#80868B' }}>Dashboard</span>
+        <div className="inline-flex p-0.5 rounded-full" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8EAED' }}>
           <button
             onClick={() => handleRoleChange('student')}
-            className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${
-              role === 'student'
-                ? 'bg-[#03E5B7] text-[#07080E] shadow-sm glow-teal'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className="px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
+            style={{
+              backgroundColor: role === 'student' ? '#E8F0FE' : 'transparent',
+              color: role === 'student' ? '#4285F4' : '#80868B',
+            }}
           >
-            #456 PLAYER
+            User
           </button>
-          {profile.role === 'corporate' && (
+          {(profile.role === 'corporate' || profile.role === 'admin') && (
             <button
               onClick={() => handleRoleChange('corporate')}
-              className={`px-2 py-0.5 rounded text-[10px] font-black transition-all flex items-center gap-1 ${
-                role === 'corporate'
-                  ? 'bg-[#FFC700] text-[#07080E] shadow-sm glow-gold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              className="px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all flex items-center gap-1"
+              style={{
+                backgroundColor: role === 'corporate' ? '#FEF7E0' : 'transparent',
+                color: role === 'corporate' ? '#E37400' : '#80868B',
+              }}
             >
-              <Briefcase className="w-2.5 h-2.5" />
               CSR
+            </button>
+          )}
+          {(profile.role === 'government' || profile.role === 'admin') && (
+            <button
+              onClick={() => handleRoleChange('government')}
+              className="px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all"
+              style={{
+                backgroundColor: role === 'government' ? '#E6F4EA' : 'transparent',
+                color: role === 'government' ? '#137333' : '#80868B',
+              }}
+            >
+              Gov
             </button>
           )}
         </div>
@@ -349,63 +438,67 @@ export const Sidebar: React.FC = () => {
             sessionStorage.setItem('sidebar_scroll_top', e.currentTarget.scrollTop.toString());
           }
         }}
-        className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar"
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-4"
       >
-        {currentSections.map((sec) => (
-          <div key={sec.title}>
-            <div className="px-2 mb-1.5 text-[9px] font-bold text-[#FF007A] tracking-widest uppercase flex items-center justify-between font-sans">
-              <span>{sec.title}</span>
+        {currentSections.map((sec) => {
+          const sectionColor = sectionColors[sec.title] || '#4285F4';
+          return (
+            <div key={sec.title}>
+              <div className="px-2 mb-1.5 text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5"
+                style={{ color: sectionColor }}>
+                <div className="w-1 h-3 rounded-full" style={{ backgroundColor: sectionColor, opacity: 0.5 }} />
+                <span>{sec.title}</span>
+              </div>
+              <div className="space-y-0.5">
+                {sec.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item.id)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs transition-all"
+                      style={{
+                        backgroundColor: isActive ? '#E8F0FE' : 'transparent',
+                        color: isActive ? '#1A73E8' : '#3C4043',
+                        fontWeight: isActive ? 600 : 400,
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon
+                          className="w-4 h-4"
+                          style={{ color: isActive ? '#4285F4' : '#80868B' }}
+                        />
+                        <span>{item.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {item.badge && (
+                          <span
+                            className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
+                            style={{
+                              backgroundColor: isActive ? '#D2E3FC' : '#F1F3F4',
+                              color: isActive ? '#1A73E8' : '#80868B',
+                            }}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        <ChevronRight
+                          className="w-3.5 h-3.5"
+                          style={{ color: isActive ? '#4285F4' : '#DADCE0' }}
+                        />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="space-y-0.5">
-              {sec.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleItemClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all ${
-                      isActive
-                        ? 'bg-[#180B1B] border border-[#FF007A] text-white font-bold shadow-[0_0_15px_rgba(255,0,122,0.3)] border-l-4 border-l-[#FF007A]'
-                        : 'text-slate-300 hover:text-white hover:bg-[#0D0F17] border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        className={`w-4 h-4 ${
-                          isActive ? 'text-[#FF007A]' : 'text-slate-500'
-                        }`}
-                      />
-                      <span className="tracking-wide">{item.label}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {item.badge && (
-                        <span
-                          className={`text-[8px] px-1.5 py-0.5 rounded font-mono font-bold ${
-                            isActive
-                              ? 'bg-[#FF007A]/20 text-[#FF007A] border border-[#FF007A]/40'
-                              : 'bg-[#07080E] border border-[#1D2133] text-slate-400'
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                      <ChevronRight
-                        className={`w-3.5 h-3.5 ${
-                          isActive ? 'text-[#FF007A]' : 'text-slate-600'
-                        }`}
-                      />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Sidebar Footer Player Info Card */}
-      <div className="p-2.5 border-t border-[#1D2133] bg-[#0D0F17]">
+      <div className="p-2.5 border-t" style={{ borderColor: '#E8EAED' }}>
         <div
           onClick={() => {
             if (!isAuthenticated) {
@@ -415,29 +508,50 @@ export const Sidebar: React.FC = () => {
               handleItemClick('community-profile');
             }
           }}
-          className="p-2 rounded bg-[#07080E] border border-[#FF007A]/40 hover:border-[#FF007A] cursor-pointer transition-all flex items-center justify-between"
+          className="p-2.5 rounded-xl cursor-pointer transition-all flex items-center justify-between hover:bg-gray-50"
+          style={{ border: '1px solid #E8EAED' }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#FF007A]/20 border border-[#FF007A] flex items-center justify-center text-[#FF007A] font-black text-xs">
-              {profile.playerNumber || '#456'}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              style={{ backgroundColor: '#4285F4' }}
+            >
+              {profile.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-white truncate max-w-[100px]">{profile.name}</span>
-                <span className={`text-[8px] px-1 py-0.2 rounded font-bold border ${
-                  isAuthenticated
-                    ? 'bg-[#03E5B7]/20 text-[#03E5B7] border-[#03E5B7]/40'
-                    : 'bg-[#FF007A]/20 text-[#FF007A] border-[#FF007A]/40'
-                }`}>
-                  {isAuthenticated ? '◯ VERIFIED' : 'GUEST'}
+                <span className="text-xs font-semibold truncate max-w-[100px]"
+                  style={{ color: '#202124' }}>
+                  {profile.name}
+                </span>
+                <span
+                  className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold"
+                  style={{
+                    backgroundColor: isAuthenticated ? '#E6F4EA' : '#FCE8E6',
+                    color: isAuthenticated ? '#137333' : '#D93025',
+                  }}
+                >
+                  {isAuthenticated ? 'Verified' : 'Guest'}
                 </span>
               </div>
-              <p className="text-[9px] text-[#FF007A] font-bold">
-                {isAuthenticated ? 'CONTESTANT · ACTIVE' : 'TAP TO AUTHENTICATE'}
+              <p className="text-[10px]" style={{ color: '#80868B' }}>
+                {isAuthenticated ? `${profile.ecoPoints || 0} Eco Points` : 'Tap to sign in'}
               </p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-[#FF007A]" />
+          {isAuthenticated && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                logout();
+                closeMobileMenu();
+              }}
+              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="w-3.5 h-3.5" style={{ color: '#80868B' }} />
+            </button>
+          )}
         </div>
       </div>
     </>
@@ -446,20 +560,33 @@ export const Sidebar: React.FC = () => {
   return (
     <>
       {/* Persistent Desktop Navigation Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-[#07080E] border-r border-[#1D2133] h-screen sticky top-0 z-40 select-none font-mono">
+      <aside
+        className="hidden md:flex flex-col w-64 h-screen sticky top-0 z-40 select-none"
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRight: '1px solid #E8EAED',
+        }}
+      >
         {renderInnerContent(false)}
       </aside>
 
       {/* Mobile Drawer Overlay & Slide-over Navigation */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
-          {/* Backdrop Blur */}
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
             onClick={closeMobileMenu}
           />
           {/* Slide-over Container */}
-          <aside className="relative flex flex-col w-72 max-w-[85vw] bg-[#07080E] border-r border-[#1D2133] h-full shadow-2xl z-10 select-none font-mono animate-in slide-in-from-left duration-200">
+          <aside
+            className="relative flex flex-col w-72 max-w-[85vw] h-full z-10 select-none animate-slide-in-left"
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRight: '1px solid #E8EAED',
+              boxShadow: '4px 0 24px rgba(60, 64, 67, 0.15)',
+            }}
+          >
             {renderInnerContent(true)}
           </aside>
         </div>
@@ -467,5 +594,3 @@ export const Sidebar: React.FC = () => {
     </>
   );
 };
-
-

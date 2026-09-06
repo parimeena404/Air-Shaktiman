@@ -72,6 +72,8 @@ export default function Home() {
         router.push('/organization');
       } else if (role === 'corporate') {
         router.push('/csr');
+      } else if (role === 'government') {
+        router.push('/government');
       } else {
         router.push('/user');
       }
@@ -203,11 +205,11 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen relative items-center justify-center bg-[#07080E]">
+    <div className="flex min-h-screen relative items-center justify-center" style={{ backgroundColor: '#F8F9FA' }}>
       <SquidCyberBackground />
       <div className="relative z-10 flex flex-col items-center">
-        <span className="inline-block w-12 h-12 border-4 border-[#FF007A] border-t-transparent rounded-full animate-spin mb-4" />
-        <h2 className="text-[#03E5B7] font-mono tracking-widest text-xl animate-pulse">ROUTING TO PORTAL...</h2>
+        <span className="inline-block w-10 h-10 border-3 rounded-full animate-spin mb-4" style={{ borderColor: '#E8EAED', borderTopColor: '#4285F4' }} />
+        <h2 className="text-sm font-semibold tracking-wide" style={{ color: '#5F6368' }}>Redirecting to dashboard...</h2>
       </div>
     </div>
   );

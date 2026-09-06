@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Lock, Mail, User as UserIcon, Shield, Briefcase, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
 import { useEco } from '../../context/EcoContext';
 
 export const AuthModal: React.FC = () => {
@@ -10,7 +9,7 @@ export const AuthModal: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'student' | 'corporate' | 'admin'>('student');
+  const [role, setRole] = useState<'student' | 'corporate' | 'admin' | 'government'>('student');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -39,227 +38,161 @@ export const AuthModal: React.FC = () => {
     try {
       if (isLoginView) {
         if (!email || !password) {
-          throw new Error('Please fill in all required fields.');
+          throw new Error('Please enter your email and password.');
         }
         await login(email, password);
-        setSuccessMsg('Access Granted! Welcome to EcoVerse Arena.');
-        setTimeout(() => {
-          closeAuthModal();
-          resetForm();
-        }, 1200);
+        setSuccessMsg('Login successful! Redirecting...');
+        setTimeout(() => closeAuthModal(), 800);
       } else {
         if (!name || !email || !password) {
-          throw new Error('Please fill in all required fields.');
+          throw new Error('All fields are required.');
         }
         if (password.length < 6) {
           throw new Error('Password must be at least 6 characters.');
         }
         await register(name, email, password, role);
-        setSuccessMsg('Registration Successful! Logging you in...');
-        setTimeout(() => {
-          closeAuthModal();
-          resetForm();
-        }, 1200);
+        setSuccessMsg('Account created! Welcome aboard.');
+        setTimeout(() => closeAuthModal(), 800);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication failed. Please check your credentials.');
+      setErrorMsg(err.message || 'Authentication failed.');
     } finally {
       setLoading(false);
     }
   };
 
+  const roles = [
+    { id: 'student' as const, label: 'User', color: '#4285F4', bg: '#E8F0FE' },
+    { id: 'corporate' as const, label: 'Corporate', color: '#FBBC04', bg: '#FEF7E0' },
+    { id: 'government' as const, label: 'Government', color: '#34A853', bg: '#E6F4EA' },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-[#07080E] border border-[#FF007A]/40 rounded-xl shadow-[0_0_50px_rgba(255,0,122,0.25)] overflow-hidden font-sans text-white">
-        {/* Top Decorative Cyber Banner */}
-        <div className="h-1.5 bg-gradient-to-r from-[#FF007A] via-[#FFC700] to-[#03E5B7]" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+        onClick={closeAuthModal}
+      />
 
-        {/* Modal Header */}
-        <div className="p-5 border-b border-[#1D2133] flex items-center justify-between bg-[#0D0F17]">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#FF007A] text-sm font-bold">◯ △ □</span>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#03E5B7]">
-                AUTH PROTOCOL // V2.0
-              </span>
-            </div>
-            <h2 className="text-xl font-black tracking-wide text-white mt-1">
-              {isLoginView ? 'CONTESTANT LOGIN' : 'NEW PLAYER REGISTRATION'}
-            </h2>
-          </div>
+      {/* Modal */}
+      <div className="relative z-10 w-full max-w-md bg-white rounded-2xl overflow-hidden animate-fade-in-up"
+        style={{ boxShadow: '0 8px 32px rgba(60, 64, 67, 0.25)' }}>
+
+        {/* Accent bar */}
+        <div className="gdg-accent-bar" />
+
+        {/* Close button */}
+        <button
+          onClick={closeAuthModal}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors z-10"
+          style={{ backgroundColor: '#F1F3F4', color: '#5F6368' }}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Header */}
+        <div className="px-8 pt-8 pb-4 text-center">
+          <h2 className="text-xl font-bold mb-1" style={{ color: '#202124' }}>
+            {isLoginView ? 'Sign In' : 'Create Account'}
+          </h2>
+          <p className="text-sm" style={{ color: '#5F6368' }}>
+            {isLoginView ? 'Access your dashboard' : 'Join Air Shaktiman'}
+          </p>
+        </div>
+
+        {/* Tab */}
+        <div className="mx-8 flex rounded-full p-1 mb-5" style={{ backgroundColor: '#F1F3F4' }}>
           <button
-            onClick={() => {
-              closeAuthModal();
-              resetForm();
+            type="button"
+            onClick={() => { setIsLoginView(true); resetForm(); }}
+            className="flex-1 py-2 text-center rounded-full text-sm font-semibold transition-all"
+            style={{
+              backgroundColor: isLoginView ? '#FFFFFF' : 'transparent',
+              color: isLoginView ? '#202124' : '#5F6368',
+              boxShadow: isLoginView ? '0 1px 3px rgba(60, 64, 67, 0.15)' : 'none',
             }}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1D2133] transition-all"
-            aria-label="Close modal"
           >
-            <X className="w-5 h-5 text-[#FF007A]" />
-          </button>
-        </div>
-
-        {/* Mode Toggle Tabs */}
-        <div className="grid grid-cols-2 p-1 bg-[#0D0F17] border-b border-[#1D2133] font-mono text-xs font-bold">
-          <button
-            type="button"
-            onClick={toggleView}
-            className={`py-2 text-center rounded transition-all ${
-              isLoginView
-                ? 'bg-[#FF007A] text-white shadow-md glow-pink'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            LOGIN ARENA
+            Sign In
           </button>
           <button
             type="button"
-            onClick={toggleView}
-            className={`py-2 text-center rounded transition-all ${
-              !isLoginView
-                ? 'bg-[#03E5B7] text-[#07080E] shadow-md glow-teal'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            onClick={() => { setIsLoginView(false); resetForm(); }}
+            className="flex-1 py-2 text-center rounded-full text-sm font-semibold transition-all"
+            style={{
+              backgroundColor: !isLoginView ? '#FFFFFF' : 'transparent',
+              color: !isLoginView ? '#202124' : '#5F6368',
+              boxShadow: !isLoginView ? '0 1px 3px rgba(60, 64, 67, 0.15)' : 'none',
+            }}
           >
-            SIGN UP
+            Create Account
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4">
           {errorMsg && (
-            <div className="p-3 rounded-lg bg-[#FF007A]/10 border border-[#FF007A]/40 flex items-start gap-2.5 text-xs text-[#FF007A] font-medium animate-in fade-in">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{errorMsg}</span>
+            <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: '#FCE8E6', color: '#D93025' }}>
+              {errorMsg}
             </div>
           )}
-
           {successMsg && (
-            <div className="p-3 rounded-lg bg-[#03E5B7]/10 border border-[#03E5B7]/40 flex items-start gap-2.5 text-xs text-[#03E5B7] font-medium animate-in fade-in">
-              <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{successMsg}</span>
+            <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: '#E6F4EA', color: '#137333' }}>
+              {successMsg}
             </div>
           )}
 
           {!isLoginView && (
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
-                Full Name
-              </label>
-              <div className="relative">
-                <UserIcon className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Player 456"
-                  className="w-full pl-9 pr-3 py-2 bg-[#0D0F17] border border-[#1D2133] rounded-lg text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#03E5B7] transition-all"
-                />
-              </div>
+              <label className="text-xs font-semibold" style={{ color: '#5F6368' }}>Full Name</label>
+              <input type="text" required value={name} onChange={(e) => setName(e.target.value)}
+                placeholder="Your name" className="gdg-input" />
             </div>
           )}
 
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
-                Email Address
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('thakrethe@gmail.com');
-                  setPassword('thakrethe@gmail.com');
-                }}
-                className="text-[10px] font-mono text-[#03E5B7] hover:underline flex items-center gap-1"
-              >
-                <Shield className="w-3 h-3 text-[#03E5B7]" />
-                <span>Admin Quick Fill (thakrethe@gmail.com)</span>
-              </button>
-            </div>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="thakrethe@gmail.com"
-                className="w-full pl-9 pr-3 py-2 bg-[#0D0F17] border border-[#1D2133] rounded-lg text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#03E5B7] transition-all"
-              />
-            </div>
+            <label className="text-xs font-semibold" style={{ color: '#5F6368' }}>Email</label>
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com" className="gdg-input" />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2 bg-[#0D0F17] border border-[#1D2133] rounded-lg text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#03E5B7] transition-all"
-              />
-            </div>
+            <label className="text-xs font-semibold" style={{ color: '#5F6368' }}>Password</label>
+            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••" className="gdg-input" />
           </div>
 
           {!isLoginView && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold uppercase tracking-wider">
-                Role Identity
-              </label>
-              <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-                <button
-                  type="button"
-                  onClick={() => setRole('student')}
-                  className={`p-2 rounded-lg border text-center transition-all flex flex-col items-center gap-1 ${
-                    role === 'student'
-                      ? 'bg-[#03E5B7]/20 border-[#03E5B7] text-[#03E5B7] font-bold'
-                      : 'bg-[#0D0F17] border-[#1D2133] text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Student Player</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('corporate')}
-                  className={`p-2 rounded-lg border text-center transition-all flex flex-col items-center gap-1 ${
-                    role === 'corporate'
-                      ? 'bg-[#FFC700]/20 border-[#FFC700] text-[#FFC700] font-bold'
-                      : 'bg-[#0D0F17] border-[#1D2133] text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Briefcase className="w-3.5 h-3.5" />
-                  <span>CSR Corporate</span>
-                </button>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold" style={{ color: '#5F6368' }}>Account Type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {roles.map((r) => (
+                  <button key={r.id} type="button" onClick={() => setRole(r.id)}
+                    className="p-2.5 rounded-xl border-2 text-center transition-all text-xs font-semibold"
+                    style={{
+                      borderColor: role === r.id ? r.color : '#E8EAED',
+                      backgroundColor: role === r.id ? r.bg : '#FFFFFF',
+                      color: role === r.id ? r.color : '#5F6368',
+                    }}>
+                    {r.label}
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 mt-2 rounded-lg bg-gradient-to-r from-[#FF007A] via-[#FFC700] to-[#03E5B7] font-mono font-bold text-sm text-[#07080E] hover:brightness-110 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(3,229,183,0.3)] disabled:opacity-50 flex items-center justify-center gap-2"
-          >
+          <button type="submit" disabled={loading}
+            className="w-full py-3 rounded-full font-semibold text-sm text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            style={{ backgroundColor: '#4285F4' }}>
             {loading ? (
-              <span className="inline-block w-4 h-4 border-2 border-[#07080E] border-t-transparent rounded-full animate-spin" />
-            ) : isLoginView ? (
-              'AUTHENTICATE & ENTER'
+              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
             ) : (
-              'REGISTER & ENTER ARENA'
+              <span>{isLoginView ? 'Sign In' : 'Create Account'}</span>
             )}
           </button>
         </form>
-
-        {/* Footer info */}
-        <div className="px-6 py-3 bg-[#0D0F17] border-t border-[#1D2133] text-center text-[10px] text-slate-500 font-mono">
-          SECURED BY MONGOOSE & JWT ENCRYPTION // ECOVERSE DB
-        </div>
       </div>
     </div>
   );

@@ -363,6 +363,7 @@ export const EcoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let portalPrefix = '/user';
     if (role === 'admin') portalPrefix = '/organization';
     else if (role === 'corporate') portalPrefix = '/csr';
+    else if (role === 'government') portalPrefix = '/government';
 
     const targetPath = tab === 'overview' ? portalPrefix : `${portalPrefix}/${tab}`;
     if (pathname !== targetPath) {

@@ -2,10 +2,9 @@ import React from 'react';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Header } from '../../components/layout/Header';
 import { AuthModal } from '../../components/auth/AuthModal';
-import { ShinchanCollector } from '../../components/game/ShinchanCollector';
 import { SquidCyberBackground } from '../../components/layout/SquidCyberBackground';
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default function GovernmentLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen relative" style={{ backgroundColor: '#F8F9FA' }}>
       <SquidCyberBackground />
@@ -16,7 +15,6 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
       </div>
-      <ShinchanCollector />
       <AuthModal />
     </div>
   );

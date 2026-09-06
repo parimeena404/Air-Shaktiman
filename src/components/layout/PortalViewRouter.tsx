@@ -62,6 +62,11 @@ export const PortalViewRouter: React.FC = () => {
     return <AdminOverviewView />;
   }
 
+  // If role is set to Government and overview is selected, show Government Connect
+  if (role === 'government' && activeTab === 'overview') {
+    return <GovernmentConnectView />;
+  }
+
   switch (activeTab) {
     case 'overview':
       return <OverviewView />;
